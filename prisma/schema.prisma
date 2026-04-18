@@ -28,8 +28,6 @@ enum ProductStatus {
 enum BatchStatus {
   CRITICAL
   STABLE
-  NEAR_EXPIRY
-  EXPIRED
 }
 
 enum BatchMovementType {
@@ -664,12 +662,10 @@ model PurchaseInvoiceItem {
   productId         String
   product           Product         @relation(fields: [productId], references: [id])
   batchNumber       String?
-  manufacturedDate  DateTime?
-  quantity          Int
-  unitsInPack       Int             @default(1) // Штук в коробке
-  totalUnits        Int             @default(0) // Всего штук (quantity * unitsInPack)
-  packPrice         Float           @default(0) // Цена за упаковку
-  unitPrice         Float           @default(0) // Цена за штуку
+  manufacturedDate DateTime
+  receivedAt       DateTime             @default(now())
+  status           BatchStatus
+  @@index([productId])
   total             Float           @default(0) // Сумма
   lineDiscount      Float           @default(0)
   lineTotal         Float           @default(0)
@@ -786,7 +782,7 @@ model OcrRow {
   purchasePrice    Float?
   total            Float?
   batchNumber      String?
-  expiryDate       DateTime?
+  // expiryDate removed
   matchedProductId String?
   matchedProduct   Product?      @relation(fields: [matchedProductId], references: [id])
   confidence       OcrConfidence @default(LOW)
@@ -897,7 +893,7 @@ model Reservation {
   batch     Batch     @relation(fields: [batchId], references: [id], onDelete: Cascade)
   quantity  Int
   status    String    @default("ACTIVE")
-  expiredAt DateTime?
+  // expiredAt removed
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 

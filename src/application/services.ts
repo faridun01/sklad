@@ -56,7 +56,7 @@ export class InventoryService {
 
     const newBatch: Batch = {
       ...batchData,
-      status: this.calculateBatchStatus(batchData.expiryDate),
+      status: 'STABLE',
       movements: [newMovement]
     };
 
@@ -95,14 +95,7 @@ export class InventoryService {
     this.logger.warn(`Write-off processed for ${product.name}`, { productId, batchId, quantity, reason });
   }
 
-  private calculateBatchStatus(expiryDate: Date): 'CRITICAL' | 'STABLE' | 'NEAR_EXPIRY' | 'EXPIRED' {
-    const now = new Date();
-    const diffDays = Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-    if (diffDays <= 0) return 'EXPIRED';
-    if (diffDays <= 30) return 'CRITICAL';
-    if (diffDays <= 90) return 'NEAR_EXPIRY';
-    return 'STABLE';
-  }
+  // calculateBatchStatus removed
 }
 
 /**
@@ -135,13 +128,12 @@ export class POSService {
       product.totalStock -= item.quantity;
 
       // FIFO: Sort batches by received date (first in, first out)
-      const validBatches = product.batches.filter(b => b.expiryDate > new Date() && b.quantity > 0);
-      const sortedBatches = [...validBatches].sort((a, b) => 
+      const sortedBatches = [...product.batches.filter(b => b.quantity > 0)].sort((a, b) => 
         new Date(a.receivedAt).getTime() - new Date(b.receivedAt).getTime()
       );
 
       if (sortedBatches.reduce((acc, b) => acc + b.quantity, 0) < item.quantity) {
-        throw new Error(`Insufficient non-expired stock for ${product.name}`);
+        throw new Error(`Insufficient stock for ${product.name}`);
       }
 
       for (const batch of sortedBatches) {

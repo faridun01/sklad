@@ -55,6 +55,7 @@ export const InvoicesView: React.FC<{
   initialDetailsInvoiceId = '', 
   onInitialDetailsInvoiceHandled 
 }) => {
+  const [loadError, setLoadError] = useState<string | null>(null);
   const { t } = useTranslation();
   const { invoices, products, isLoading, refreshInvoices, refreshProducts } = usePharmacy();
   const currentDate = new Date();
@@ -92,10 +93,16 @@ export const InvoicesView: React.FC<{
   useEffect(() => {
     if (invoices.length > 0) {
       setInitialLoadPending(false);
+      setLoadError(null);
       return;
     }
     setInitialLoadPending(true);
-    refreshInvoices().finally(() => setInitialLoadPending(false));
+    setLoadError(null);
+    refreshInvoices()
+      .catch((err) => {
+        setLoadError(err?.message || 'Ошибка загрузки истории продаж');
+      })
+      .finally(() => setInitialLoadPending(false));
   }, [invoices.length, refreshInvoices]);
 
   const isInitialInvoicesLoading = initialLoadPending && invoices.length === 0;
@@ -348,6 +355,13 @@ export const InvoicesView: React.FC<{
               <tbody className="divide-y divide-[#5A5A40]/5">
                 {isInitialInvoicesLoading ? (
                   <tr><td colSpan={7} className="p-8 text-center text-sm text-[#5A5A40]/40">Загрузка...</td></tr>
+                ) : loadError ? (
+                  <tr><td colSpan={7} className="p-8 text-center text-red-500">
+                    {loadError}<br />
+                    <button className="mt-4 px-4 py-2 bg-[#5A5A40] text-white rounded" onClick={() => { setLoadError(null); setInitialLoadPending(true); refreshInvoices().finally(() => setInitialLoadPending(false)); }}>Повторить</button>
+                  </td></tr>
+                ) : filteredInvoices.length === 0 ? (
+                  <tr><td colSpan={7} className="p-8 text-center text-[#5A5A40]/40">Нет данных</td></tr>
                 ) : (
                   filteredInvoices
                         .slice(pageStartIndex, pageStartIndex + itemsPerPage)

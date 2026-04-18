@@ -13,8 +13,7 @@ export interface Batch {
   costBasis: number;
   supplier: string;
   manufacturedDate: string;
-  expiryDate: string;
-  status: 'CRITICAL' | 'STABLE' | 'NEAR_EXPIRY';
+  status: 'CRITICAL' | 'STABLE';
   movements: BatchMovement[];
 }
 
@@ -55,7 +54,6 @@ export const MOCK_PRODUCTS: Product[] = [
         costBasis: 0.12,
         supplier: 'Global Pharma Corp',
         manufacturedDate: '12 Jan 2024',
-        expiryDate: '15 Oct 2024',
         status: 'CRITICAL',
         movements: [
           { id: 'm1', type: 'RESTOCK', quantity: 5000, date: '12 Jan 2024', description: 'Initial stock from Global Pharma' },
@@ -69,7 +67,6 @@ export const MOCK_PRODUCTS: Product[] = [
         costBasis: 0.14,
         supplier: 'Sandoz International',
         manufacturedDate: '05 Mar 2024',
-        expiryDate: '22 Mar 2026',
         status: 'STABLE',
         movements: [
           { id: 'm3', type: 'RESTOCK', quantity: 8000, date: '05 Mar 2024', description: 'Bulk purchase from Sandoz' },
@@ -98,8 +95,7 @@ export const MOCK_PRODUCTS: Product[] = [
         costBasis: 1.15,
         supplier: 'Abbott Labs',
         manufacturedDate: '10 Dec 2023',
-        expiryDate: '30 Nov 2024',
-        status: 'NEAR_EXPIRY',
+        status: 'CRITICAL',
         movements: [
           { id: 'm5', type: 'RESTOCK', quantity: 100, date: '10 Dec 2023', description: 'Direct delivery from Abbott' },
           { id: 'm6', type: 'DISPATCH', quantity: 58, date: '05 Jan 2024', description: 'Clinic supply' }
@@ -207,18 +203,13 @@ export interface Notification {
   title: string;
   message: string;
   time: string;
-  type: 'expiry' | 'stock' | 'system';
+  type: 'stock' | 'system';
   read: boolean;
 }
 
 export const MOCK_NOTIFICATIONS: Notification[] = [
   {
     id: '1',
-    title: 'Batch Expiry Alert',
-    message: 'Amoxicillin Batch #BAT-AMX-2024-001 expires in 15 days.',
-    time: '5 mins ago',
-    type: 'expiry',
-    read: false
   },
   {
     id: '2',
