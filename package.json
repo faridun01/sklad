@@ -1,7 +1,7 @@
 {
-  "name": "pharmapro",
+  "name": "sklad",
   "description": "PharmaPro — Pharmacy Retail Management System",
-  "author": "PharmaPro Team",
+  "author": "Sklad Team",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -14,7 +14,7 @@
     "build:server": "node ./scripts/build-server.mjs",
     "bootstrap:admin": "node ./scripts/bootstrap-admin.mjs",
     "bundle-analysis": "node ./scripts/bundle-analyzer.mjs",
-    "seed:wholesale-demo": "node ./scripts/seed-wholesale-demo.mjs",
+    "seed:demo": "node ./scripts/seed-sklad-demo.mjs",
     "check:stock": "node ./scripts/check-stock-integrity.mjs",
     "fix:stock": "node ./scripts/check-stock-integrity.mjs --fix",
     "check:duplicate-products": "node ./scripts/merge-duplicate-products.mjs",
@@ -31,8 +31,8 @@
     "analyze:api": "node ./scripts/api-benchmark.cjs"
   },
   "build": {
-    "appId": "com.pharmapro.app",
-    "productName": "PharmaPro",
+    "appId": "com.sklad.app",
+    "productName": "Sklad",
     "directories": {
       "output": "release",
       "buildResources": "build"

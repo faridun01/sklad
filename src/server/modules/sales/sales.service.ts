@@ -13,7 +13,6 @@ export type SaleItemInput = {
   quantity: number;
   sellingPrice: number;
   discountAmount?: number;
-  prescriptionPresented?: boolean;
 };
 
 export type CompleteSaleInput = {
@@ -22,7 +21,10 @@ export type CompleteSaleInput = {
   taxAmount?: number;
   total: number;
   paymentType: 'CASH' | 'CARD' | 'CREDIT';
+  customerId?: string;
   customerName?: string;
+  customerPhone?: string;
+  customerAddress?: string;
   paidAmount?: number;
   userId: string;
 }
@@ -62,6 +64,51 @@ export class SalesService {
 
       if (!activeShift) {
         throw new ValidationError('Open a shift before completing a sale');
+      }
+
+      let customerRecord: any = null;
+      const normalizedCustomerName = String(input.customerName || '').trim();
+      const normalizedCustomerPhone = String(input.customerPhone || '').trim() || null;
+      const normalizedCustomerAddress = String(input.customerAddress || '').trim() || null;
+
+      if (input.customerId) {
+        customerRecord = await tx.customer.findUnique({
+          where: { id: input.customerId },
+        });
+
+        if (!customerRecord || !customerRecord.isActive) {
+          throw new ValidationError('Selected customer was not found');
+        }
+      } else if (normalizedCustomerName || normalizedCustomerPhone) {
+        customerRecord = await tx.customer.findFirst({
+          where: {
+            OR: [
+              ...(normalizedCustomerPhone ? [{ phone: normalizedCustomerPhone }] : []),
+              ...(normalizedCustomerName ? [{ name: normalizedCustomerName }] : []),
+            ],
+          },
+        });
+
+        if (customerRecord) {
+          customerRecord = await tx.customer.update({
+            where: { id: customerRecord.id },
+            data: {
+              name: normalizedCustomerName || customerRecord.name,
+              phone: normalizedCustomerPhone ?? customerRecord.phone,
+              address: normalizedCustomerAddress ?? customerRecord.address,
+              isActive: true,
+            },
+          });
+        } else {
+          customerRecord = await tx.customer.create({
+            data: {
+              name: normalizedCustomerName || normalizedCustomerPhone || 'Клиент',
+              phone: normalizedCustomerPhone,
+              address: normalizedCustomerAddress,
+              isActive: true,
+            },
+          });
+        }
       }
 
       const invoiceItems: Array<{
@@ -105,10 +152,6 @@ export class SalesService {
         const product = productMap.get(item.productId);
         if (!product) throw new NotFoundError(`Product ${item.productId} not found`);
         if (product.totalStock < quantity) throw new ValidationError(`Insufficient stock for ${product.name}`);
-
-        if (product.prescription && !item.prescriptionPresented) {
-            throw new ValidationError(`Prescription is required for ${product.name}`);
-        }
 
         let remainingToDeduct = quantity;
         const validBatches = product.batches.filter((batch) => batch.expiryDate > new Date());
@@ -209,11 +252,12 @@ export class SalesService {
           taxAmount: Number(input.taxAmount ?? 0),
           discount: Number(input.discountAmount ?? 0),
           paymentType: input.paymentType,
-          customer: input.customerName,
+          customer: customerRecord?.name || normalizedCustomerName || normalizedCustomerPhone || null,
           status: input.paymentType === 'CREDIT' ? 'PENDING' : 'PAID',
           paymentStatus: input.paymentType === 'CREDIT' ? 'UNPAID' : 'PAID',
           userId: input.userId,
           cashShiftId: activeShift.id,
+          customerId: customerRecord?.id ?? null,
           items: {
             create: invoiceItems as any,
           },
@@ -232,7 +276,8 @@ export class SalesService {
         await (tx as any).receivable.create({
           data: {
             invoiceId: createdInvoice.id,
-            customerName: input.customerName,
+            customerId: customerRecord?.id ?? null,
+            customerName: customerRecord?.name || normalizedCustomerName || normalizedCustomerPhone || null,
             originalAmount: totalAmount,
             paidAmount: initialPaid,
             remainingAmount: remaining,
@@ -244,12 +289,13 @@ export class SalesService {
           await tx.payment.create({
             data: {
               direction: 'IN',
-              counterpartyType: 'OTHER',
+              counterpartyType: customerRecord ? 'CUSTOMER' : 'OTHER',
               method: 'CASH', // Defaulting to cash for down payment
               amount: initialPaid,
               paymentDate: new Date(),
               status: 'PAID',
               invoiceId: createdInvoice.id,
+              customerId: customerRecord?.id ?? null,
               createdById: input.userId,
               comment: `Down payment for credit invoice ${createdInvoice.invoiceNo}`,
             },
@@ -281,7 +327,7 @@ export class SalesService {
         await tx.payment.create({
           data: {
             direction: 'IN',
-            counterpartyType: 'OTHER',
+            counterpartyType: customerRecord ? 'CUSTOMER' : 'OTHER',
             method:
               input.paymentType === 'CARD'
                 ? 'CARD'
@@ -290,6 +336,7 @@ export class SalesService {
             paymentDate: new Date(),
             status: 'PAID',
             invoiceId: createdInvoice.id,
+            customerId: customerRecord?.id ?? null,
             createdById: input.userId,
             comment: `Auto payment for invoice ${createdInvoice.invoiceNo}`,
           },
@@ -408,7 +455,8 @@ export class SalesService {
         receivableRecord = await (tx as any).receivable.create({
           data: {
             invoiceId: (invoice as any).id,
-            customerName: (invoice as any).customer || 'Аноним',
+            customerId: (invoice as any).customerId || null,
+            customerName: (invoice as any).customer || 'Клиент',
             originalAmount: Number((invoice as any).totalAmount),
             remainingAmount: Number((invoice as any).totalAmount),
             status: 'OPEN'
@@ -435,12 +483,13 @@ export class SalesService {
       await tx.payment.create({
         data: {
           direction: 'IN',
-          counterpartyType: 'OTHER',
+          counterpartyType: (invoice as any).customerId ? 'CUSTOMER' : 'OTHER',
           method: input.paymentMethod,
           amount: amount,
           paymentDate: new Date(),
           status: 'PAID',
           invoiceId: invoice.id,
+          customerId: (invoice as any).customerId || null,
           createdById: input.userId,
           comment: `Debt payment for invoice ${invoice.invoiceNo}`,
         }

@@ -52,11 +52,11 @@ export const createApp = () => {
     try {
       // Smallest possible query to verify connection
       await prisma.$queryRaw`SELECT 1`;
-      res.json({ ok: true, service: 'pharmapro-api', database: 'connected' });
+      res.json({ ok: true, service: 'sklad-api', database: 'connected' });
     } catch (err) {
       res.status(503).json({ 
         ok: false, 
-        service: 'pharmapro-api', 
+        service: 'sklad-api', 
         database: 'disconnected', 
         error: err instanceof Error ? err.message : String(err) 
       });

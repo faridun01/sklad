@@ -13,7 +13,7 @@ type JwtUser = {
 
 export type AuthedRequest = Request & { user: JwtUser };
 
-const DEV_ADMIN_EMAIL = 'admin@pharmapro.com';
+const DEV_ADMIN_EMAIL = 'admin@sklad.local';
 const DEV_ADMIN_USERNAME = 'admin';
 const DEV_ADMIN_PASSWORD = 'admin123';
 const DEV_ADMIN_PASSWORD_HASH = '$2b$10$wnlS.eRxOglKIuDgS8Nycu.g/VcgDSHkwTRNjvIx9ZSPoJZww9/ey';
@@ -21,7 +21,7 @@ const PRODUCTION_BOOTSTRAP_HINT = 'Run `npm run bootstrap:admin -- --email owner
 
 const isTrustedDesktopRequest = (req: Request) => {
   const desktopSecret = process.env.ELECTRON_DESKTOP_AUTH_SECRET;
-  const desktopHeader = req.headers['x-pharmapro-desktop-auth'];
+  const desktopHeader = req.headers['x-sklad-desktop-auth'] ?? req.headers['x-pharmapro-desktop-auth'];
   const headerValue = Array.isArray(desktopHeader) ? desktopHeader[0] : desktopHeader;
   const host = req.hostname || req.ip || '';
 

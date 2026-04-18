@@ -22,6 +22,7 @@ const ReturnPayloadSchema = z.object({
 
 const UpdateInvoiceSchema = z.object({
   customer: z.string().optional(),
+  customerId: z.string().optional(),
   taxAmount: z.number().optional(),
   discount: z.number().optional(),
   totalAmount: z.number().optional(),
@@ -71,6 +72,7 @@ export class InvoiceService {
         OR: [
           { invoiceNo: { contains: search, mode: 'insensitive' } },
           { customer: { contains: search, mode: 'insensitive' } },
+          { customerRef: { is: { name: { contains: search, mode: 'insensitive' } } } },
           { id: { contains: search, mode: 'insensitive' } },
         ]
       } : {})
@@ -85,6 +87,7 @@ export class InvoiceService {
           id: true,
           invoiceNo: true,
           customer: true,
+          customerId: true,
           totalAmount: true,
           taxAmount: true,
           discount: true,
@@ -96,6 +99,13 @@ export class InvoiceService {
           createdAt: true,
           updatedAt: true,
           cashShiftId: true,
+          customerRef: {
+            select: {
+              id: true,
+              name: true,
+              phone: true,
+            },
+          },
           items: {
             select: {
               id: true,
@@ -206,6 +216,7 @@ export class InvoiceService {
     return prisma.$transaction(async (tx) => {
       const invoice = await tx.invoice.findUnique({
         where: { id: invoiceId },
+        include: { customerRef: true },
       });
 
       if (!invoice) throw new NotFoundError('Invoice not found');
@@ -229,12 +240,13 @@ export class InvoiceService {
       await tx.payment.create({
         data: {
           direction: 'IN',
-          counterpartyType: 'OTHER',
+          counterpartyType: invoice.customerId ? 'CUSTOMER' : 'OTHER',
           method: mapPaymentMethod(payload.method),
           amount: appliedAmount,
           paymentDate: new Date(),
           status: 'PAID',
           invoiceId: invoice.id,
+          customerId: invoice.customerId,
           createdById: userId,
           comment: payload.comment || `Payment for invoice ${invoice.invoiceNo}`,
         },
@@ -276,7 +288,7 @@ export class InvoiceService {
     return prisma.$transaction(async (tx) => {
       const invoice = await tx.invoice.findUnique({
         where: { id: invoiceId },
-        include: { items: true },
+        include: { items: true, customerRef: true },
       });
 
       if (!invoice) throw new NotFoundError('Invoice not found');
@@ -408,12 +420,13 @@ export class InvoiceService {
           await tx.payment.create({
             data: {
               direction: 'OUT',
-              counterpartyType: 'OTHER',
+              counterpartyType: invoice.customerId ? 'CUSTOMER' : 'OTHER',
               method: mapPaymentMethod(payload.refundMethod),
               amount: refundAmount,
               paymentDate: new Date(),
               status: 'PAID',
               invoiceId: invoice.id,
+              customerId: invoice.customerId,
               createdById: userId,
               comment: `Refund for return ${invoiceReturn.returnNo} (Invoice ${invoice.invoiceNo})`,
             },
@@ -450,12 +463,13 @@ export class InvoiceService {
           await tx.payment.create({
             data: {
               direction: 'OUT',
-              counterpartyType: 'OTHER',
+              counterpartyType: invoice.customerId ? 'CUSTOMER' : 'OTHER',
               method: mapPaymentMethod(payload.refundMethod),
               amount: refundAmount,
               paymentDate: new Date(),
               status: 'PAID',
               invoiceId: invoice.id,
+              customerId: invoice.customerId,
               createdById: userId,
               comment: `Refund for return ${invoiceReturn.returnNo} (Invoice ${invoice.invoiceNo})`,
             },
@@ -542,7 +556,7 @@ export class InvoiceService {
     return prisma.$transaction(async (tx) => {
       const existing = await tx.invoice.findUnique({
         where: { id: invoiceId },
-        include: { items: true }
+        include: { items: true, receivable: true }
       });
 
       if (!existing) throw new NotFoundError('Invoice not found');
@@ -552,7 +566,20 @@ export class InvoiceService {
 
       // Simple header updates
       const updateData: any = {};
-      if (payload.customer !== undefined) updateData.customer = payload.customer;
+      if (payload.customerId !== undefined) {
+        const customer = payload.customerId
+          ? await tx.customer.findUnique({ where: { id: payload.customerId } })
+          : null;
+
+        if (payload.customerId && !customer) {
+          throw new ValidationError('Customer not found');
+        }
+
+        updateData.customerId = customer?.id ?? null;
+        updateData.customer = payload.customer ?? customer?.name ?? null;
+      } else if (payload.customer !== undefined) {
+        updateData.customer = payload.customer;
+      }
       if (payload.taxAmount !== undefined) updateData.taxAmount = payload.taxAmount;
       if (payload.discount !== undefined) updateData.discount = payload.discount;
       if (payload.totalAmount !== undefined) updateData.totalAmount = payload.totalAmount;
@@ -613,6 +640,19 @@ export class InvoiceService {
         include: { items: true }
       });
 
+      if (existing.receivable) {
+        await tx.receivable.update({
+          where: { invoiceId },
+          data: {
+            customerId: updated.customerId ?? null,
+            customerName: updated.customer ?? null,
+            originalAmount: Number(updated.totalAmount),
+            remainingAmount: Math.max(0, Number(updated.totalAmount) - paidTotal),
+            status: Math.max(0, Number(updated.totalAmount) - paidTotal) <= 0 ? 'PAID' : paidTotal > 0 ? 'PARTIAL' : 'OPEN',
+          },
+        });
+      }
+
       await auditService.log({
         userId,
         userRole,
@@ -630,4 +670,3 @@ export class InvoiceService {
 }
 
 export const invoiceService = new InvoiceService();
-

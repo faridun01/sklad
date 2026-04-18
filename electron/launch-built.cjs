@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const { spawn } = require('child_process');
 
-const appName = process.env.PHARMAPRO_EXE_NAME || 'PharmaPro.exe';
+const appName = process.env.SKLAD_EXE_NAME || process.env.PHARMAPRO_EXE_NAME || 'Sklad.exe';
 const appPath = path.join(process.cwd(), 'release', 'win-unpacked', appName);
 
 if (!fs.existsSync(appPath)) {

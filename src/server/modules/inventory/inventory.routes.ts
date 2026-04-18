@@ -20,7 +20,7 @@ const parseNonNegative = (value: unknown, field: string): number => {
 };
 
 // POST /restock — PHARMACIST, ADMIN, OWNER
-inventoryRouter.post('/restock', authenticate, requireRole(['PHARMACIST', 'ADMIN', 'OWNER']), asyncHandler(async (req, res) => {
+inventoryRouter.post('/restock', authenticate, requireRole(['WAREHOUSE_STAFF', 'ADMIN', 'OWNER']), asyncHandler(async (req, res) => {
   const authedReq = req as AuthedRequest;
   const body = req.body ?? {};
 
@@ -31,15 +31,15 @@ inventoryRouter.post('/restock', authenticate, requireRole(['PHARMACIST', 'ADMIN
     unit: String(body.unit || 'units'),
     costBasis: parseNonNegative(body.costBasis ?? 0, 'costBasis'),
     supplierId: body.supplierId ? String(body.supplierId) : null,
-    manufacturedDate: new Date(body.manufacturedDate),
-    expiryDate: new Date(body.expiryDate),
+    manufacturedDate: body.manufacturedDate ? new Date(body.manufacturedDate) : new Date(),
+    expiryDate: body.expiryDate ? new Date(body.expiryDate) : new Date('2099-12-31'),
   }, authedReq.user.id);
 
   res.status(201).json(result);
 }));
 
 // GET /purchase-invoices — PHARMACIST, ADMIN, OWNER
-inventoryRouter.get('/purchase-invoices', authenticate, requireRole(['PHARMACIST', 'ADMIN', 'OWNER']), asyncHandler(async (req, res) => {
+inventoryRouter.get('/purchase-invoices', authenticate, requireRole(['WAREHOUSE_STAFF', 'ADMIN', 'OWNER']), asyncHandler(async (req, res) => {
   const limit = Math.min(Number(req.query.limit) || 50, 100);
   const offset = Math.max(Number(req.query.offset) || 0, 0);
 
@@ -62,12 +62,12 @@ inventoryRouter.get('/purchase-invoices', authenticate, requireRole(['PHARMACIST
 }));
 
 // POST /purchase-invoices — PHARMACIST, ADMIN, OWNER
-inventoryRouter.post('/purchase-invoices', authenticate, requireRole(['PHARMACIST', 'ADMIN', 'OWNER']), asyncHandler(async (req, res) => {
+inventoryRouter.post('/purchase-invoices', authenticate, requireRole(['WAREHOUSE_STAFF', 'ADMIN', 'OWNER']), asyncHandler(async (req, res) => {
   const authedReq = req as AuthedRequest;
   const body = req.body ?? {};
 
   const result = await inventoryService.importPurchaseInvoice({
-    supplierId: String(body.supplierId),
+    supplierId: body.supplierId ? String(body.supplierId) : '',
     invoiceNumber: typeof body.invoiceNumber === 'string' ? body.invoiceNumber : undefined,
     invoiceDate: new Date(body.invoiceDate),
     discountAmount: parseNonNegative(body.discountAmount ?? 0, 'discountAmount'),
@@ -82,8 +82,8 @@ inventoryRouter.post('/purchase-invoices', authenticate, requireRole(['PHARMACIS
         unit: String(item.unit || 'units'),
         costBasis: parseNonNegative(item.costBasis ?? 0, `items[${idx}].costBasis`),
         wholesalePrice: item.wholesalePrice == null ? null : parseNonNegative(item.wholesalePrice, `items[${idx}].wholesalePrice`),
-        manufacturedDate: new Date(item.manufacturedDate),
-        expiryDate: new Date(item.expiryDate),
+        manufacturedDate: item.manufacturedDate ? new Date(item.manufacturedDate) : new Date(),
+        expiryDate: item.expiryDate ? new Date(item.expiryDate) : new Date('2099-12-31'),
       }))
       : [],
   }, authedReq.user.id);
@@ -130,7 +130,7 @@ inventoryRouter.delete('/batches/:id', authenticate, requireRole(['ADMIN', 'OWNE
   res.json(result);
 }));
 // POST /purchase-invoices/:id/approve — PHARMACIST, ADMIN, OWNER
-inventoryRouter.post('/purchase-invoices/:id/approve', authenticate, requireRole(['PHARMACIST', 'ADMIN', 'OWNER']), asyncHandler(async (req, res) => {
+inventoryRouter.post('/purchase-invoices/:id/approve', authenticate, requireRole(['WAREHOUSE_STAFF', 'ADMIN', 'OWNER']), asyncHandler(async (req, res) => {
   const authedReq = req as AuthedRequest;
   const result = await inventoryService.approvePurchaseInvoice(req.params.id, authedReq.user.id);
   res.json(result);

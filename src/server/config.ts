@@ -13,7 +13,7 @@ const configSchema = z.object({
 });
 
 const getRawConfig = () => {
-  const DEFAULT_DB_URL = 'postgresql://postgres:postgres@localhost:5432/pharmapro';
+  const DEFAULT_DB_URL = 'postgresql://postgres:postgres@localhost:5432/sklad';
   
   return {
     NODE_ENV: process.env.NODE_ENV,

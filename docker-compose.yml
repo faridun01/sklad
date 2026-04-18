@@ -1,17 +1,17 @@
 services:
   db:
     image: postgres:15-alpine
-    container_name: pharmapro-db
+    container_name: sklad-db
     restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${DB_PASSWORD:-2468}
-      POSTGRES_DB: ${DB_NAME:-pharmapro_test}
+      POSTGRES_DB: ${DB_NAME:-sklad}
     ports:
       - "${DB_PORT:-5432}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./logs:/var/log/pharmapro
+      - ./logs:/var/log/sklad
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s

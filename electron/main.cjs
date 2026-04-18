@@ -123,7 +123,7 @@ const waitForServer = (url, timeoutMs = 20000) => {
         res.on('end', () => {
           try {
             const parsed = JSON.parse(body || '{}');
-            if (parsed.ok === true && parsed.service === 'pharmapro-api') {
+            if (parsed.ok === true && (parsed.service === 'sklad-api' || parsed.service === 'pharmapro-api')) {
               resolve(true);
               return;
             }
@@ -343,7 +343,7 @@ const startInternalBackend = async () => {
       PHARMAPRO_DIST_PATH: path.join(app.getAppPath(), 'dist'),
       // Tell the backend's env.ts where to find the .env file so dotenv.config()
       // can load DATABASE_URL even in standalone (non-project-root) deployments.
-      ...(runtimeEnvFile ? { PHARMAPRO_ENV_FILE: runtimeEnvFile } : {}),
+      ...(runtimeEnvFile ? { SKLAD_ENV_FILE: runtimeEnvFile, PHARMAPRO_ENV_FILE: runtimeEnvFile } : {}),
       ...(prismaEngine ? { PRISMA_QUERY_ENGINE_LIBRARY: prismaEngine } : {}),
     },
     windowsHide: true,
@@ -374,7 +374,7 @@ function createWindow() {
       additionalArguments: [`--pharmapro-started-at=${appStartupStartedAt}`],
     },
     icon: windowIcon,
-    title: 'PharmaPro Management System',
+    title: 'Sklad Management System',
     backgroundColor: '#151619',
     show: false,
   });
@@ -582,6 +582,7 @@ ipcMain.on('window:close', () => {
 
 ipcMain.handle('desktop:get-auth-headers', () => {
   return {
+    'x-sklad-desktop-auth': desktopAuthSecret,
     'x-pharmapro-desktop-auth': desktopAuthSecret,
   };
 });

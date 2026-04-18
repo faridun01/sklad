@@ -21,10 +21,12 @@ const currentDir =
 // Try candidate paths in priority order so the backend finds .env regardless
 // of how the exe was launched (from project root, from resources dir, etc.)
 const candidates = [
-  process.env.PHARMAPRO_ENV_FILE,         // explicit override from Electron main
+  process.env.SKLAD_ENV_FILE || process.env.PHARMAPRO_ENV_FILE, // explicit override, keep legacy fallback
   path.join(process.cwd(), '.env'),        // inherited CWD
   path.join(currentDir, '../../.env'),     // project root in dev / dist-server in prod
   // Desktop-specific paths
+  process.env.APPDATA ? path.join(process.env.APPDATA, 'sklad', '.env') : null,
+  process.platform === 'darwin' ? path.join(process.env.HOME || '', 'Library/Application Support', 'sklad', '.env') : null,
   process.env.APPDATA ? path.join(process.env.APPDATA, 'pharmapro', '.env') : null,
   process.platform === 'darwin' ? path.join(process.env.HOME || '', 'Library/Application Support', 'pharmapro', '.env') : null,
 ].filter(Boolean) as string[];

@@ -5,6 +5,7 @@ import { prisma } from '../../infrastructure/prisma';
 import { auditService } from '../../services/audit.service';
 import { NotFoundError, ValidationError } from '../../common/errors';
 import { reportCache } from '../../common/cache';
+import { findPrimarySupplier } from '../../common/defaultSupplier';
 
 export const suppliersRouter = Router();
 
@@ -311,14 +312,27 @@ suppliersRouter.post('/', authenticate, requireRole(['ADMIN', 'OWNER']), asyncHa
     throw new ValidationError('Supplier name is required');
   }
 
-  const created = await prisma.supplier.create({
-    data: {
-      name,
-      contact: normalizeNullable(req.body?.contact),
-      email: normalizeNullable(req.body?.email),
-      address: normalizeNullable(req.body?.address),
-    },
-  });
+  const existingPrimary = await findPrimarySupplier();
+
+  const created = existingPrimary
+    ? await prisma.supplier.update({
+        where: { id: existingPrimary.id },
+        data: {
+          name,
+          contact: normalizeNullable(req.body?.contact),
+          email: normalizeNullable(req.body?.email),
+          address: normalizeNullable(req.body?.address),
+          isActive: true,
+        },
+      })
+    : await prisma.supplier.create({
+        data: {
+          name,
+          contact: normalizeNullable(req.body?.contact),
+          email: normalizeNullable(req.body?.email),
+          address: normalizeNullable(req.body?.address),
+        },
+      });
 
   await auditService.log({
     userId: authedReq.user.id,
@@ -395,6 +409,14 @@ suppliersRouter.delete('/:id', authenticate, requireRole(['ADMIN', 'OWNER']), as
   const existing = await prisma.supplier.findUnique({ where: { id } });
   if (!existing || !existing.isActive) {
     throw new NotFoundError('Supplier not found');
+  }
+
+  const activeSuppliers = await prisma.supplier.count({
+    where: { isActive: true },
+  });
+
+  if (activeSuppliers <= 1) {
+    throw new ValidationError('Single supplier profile cannot be deleted. Update it instead.');
   }
 
   await prisma.supplier.update({

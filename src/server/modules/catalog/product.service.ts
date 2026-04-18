@@ -27,8 +27,6 @@ const CreateProductSchema = z.object({
   minStock: z.number().optional().default(10),
   costPrice: z.number().optional().default(0),
   sellingPrice: z.number().min(0, 'Price cannot be negative').optional().default(0),
-  prescription: z.boolean().optional().default(false),
-  markingRequired: z.boolean().optional().default(false),
   status: z.string().optional().nullable(),
   analogs: z.union([z.array(z.string()), z.string()]).optional().nullable(),
   batches: z.array(z.object({
@@ -149,8 +147,8 @@ export class ProductService {
       minStock: data.minStock,
       costPrice: data.costPrice,
       sellingPrice: data.sellingPrice,
-      prescription: data.prescription,
-      markingRequired: data.markingRequired,
+      prescription: false,
+      markingRequired: false,
       analogs: Array.isArray(data.analogs) ? JSON.stringify(data.analogs) : normalizeNullableText(data.analogs),
     };
 
@@ -262,8 +260,6 @@ export class ProductService {
     if (data.minStock !== undefined) productData.minStock = data.minStock;
     if (data.costPrice !== undefined) productData.costPrice = data.costPrice;
     if (data.sellingPrice !== undefined) productData.sellingPrice = data.sellingPrice;
-    if (data.prescription !== undefined) productData.prescription = data.prescription;
-    if (data.markingRequired !== undefined) productData.markingRequired = data.markingRequired;
     if (data.analogs !== undefined) productData.analogs = Array.isArray(data.analogs) ? JSON.stringify(data.analogs) : normalizeNullableText(data.analogs);
 
     try {

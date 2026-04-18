@@ -118,7 +118,7 @@ customersRouter.get(
 customersRouter.post(
   '/',
   authenticate,
-  requireRole(['ADMIN', 'OWNER', 'CASHIER', 'PHARMACIST']),
+  requireRole(['ADMIN', 'OWNER', 'CASHIER', 'WAREHOUSE_STAFF']),
   asyncHandler(async (req, res) => {
     const authedReq = req as AuthedRequest;
     const { name, legalName, phone, email, address, taxId, creditLimit, defaultDiscount, paymentTermDays } = req.body ?? {};
@@ -158,7 +158,7 @@ customersRouter.post(
 customersRouter.put(
   '/:id',
   authenticate,
-  requireRole(['ADMIN', 'OWNER', 'CASHIER', 'PHARMACIST']),
+  requireRole(['ADMIN', 'OWNER', 'CASHIER', 'WAREHOUSE_STAFF']),
   asyncHandler(async (req, res) => {
     const authedReq = req as AuthedRequest;
     const { id } = req.params;

@@ -59,14 +59,14 @@ productsRouter.get('/barcode/:code', authenticate, asyncHandler(async (req, res)
 
 
 // POST / — PHARMACIST, ADMIN, OWNER
-productsRouter.post('/', authenticate, requireRole(['PHARMACIST', 'ADMIN', 'OWNER']), asyncHandler(async (req, res) => {
+productsRouter.post('/', authenticate, requireRole(['WAREHOUSE_STAFF', 'ADMIN', 'OWNER']), asyncHandler(async (req, res) => {
   const authedReq = req as AuthedRequest;
   const created = await productService.createProduct(req.body, authedReq.user.id, authedReq.user.role);
   res.status(201).json(created);
 }));
 
 // PUT /:id — PHARMACIST, ADMIN, OWNER
-productsRouter.put('/:id', authenticate, requireRole(['PHARMACIST', 'ADMIN', 'OWNER']), asyncHandler(async (req, res) => {
+productsRouter.put('/:id', authenticate, requireRole(['WAREHOUSE_STAFF', 'ADMIN', 'OWNER']), asyncHandler(async (req, res) => {
   const authedReq = req as AuthedRequest;
   const updated = await productService.updateProduct(req.params.id, req.body, authedReq.user.id, authedReq.user.role);
   res.json(updated);

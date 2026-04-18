@@ -4,6 +4,7 @@ import { NotFoundError, ValidationError } from '../../common/errors';
 import { reportCache } from '../../common/cache';
 import { computeBatchStatus } from '../../common/batchStatus';
 import { round } from '../../common/utils';
+import { ensurePrimarySupplier } from '../../common/defaultSupplier';
 
 export type RestockItemInput = {
   productId: string;
@@ -50,6 +51,14 @@ export class InventoryService {
     if (!input.batchNumber) throw new ValidationError('batchNumber is required');
     if (!input.quantity || input.quantity <= 0) throw new ValidationError('quantity must be a positive number');
 
+    const supplier = input.supplierId
+      ? await db.supplier.findUnique({ where: { id: input.supplierId } })
+      : await ensurePrimarySupplier();
+
+    if (input.supplierId && !supplier) {
+      throw new NotFoundError(`Supplier ${input.supplierId} not found`);
+    }
+
     const result = await db.$transaction(async (tx: any) => {
       const product = await tx.product.findUnique({
         where: { id: input.productId },
@@ -76,7 +85,7 @@ export class InventoryService {
           costBasis: input.costBasis,
           purchasePrice: input.costBasis,
           retailPrice: null,
-          supplierId: input.supplierId || null,
+          supplierId: supplier?.id || null,
           warehouseId: warehouse?.id ?? null,
           manufacturedDate: input.manufacturedDate,
           receivedAt: new Date(),
@@ -317,15 +326,21 @@ export class InventoryService {
   }
 
   async importPurchaseInvoice(input: PurchaseInvoiceImportInput, userId: string) {
-    if (!input.supplierId) throw new ValidationError('supplierId is required');
     if (!String(input.invoiceNumber || '').trim()) throw new ValidationError('invoiceNumber is required');
     if (!input.items.length) throw new ValidationError('At least one purchase item is required');
 
     const invoiceNumber = String(input.invoiceNumber || '').trim();
+    const resolvedSupplier = input.supplierId
+      ? await db.supplier.findUnique({ where: { id: input.supplierId } })
+      : await ensurePrimarySupplier();
+
+    if (!resolvedSupplier) {
+      throw new ValidationError('Supplier profile is not configured');
+    }
 
     const result = await db.$transaction(async (tx: any) => {
-      const supplier = await tx.supplier.findUnique({ where: { id: input.supplierId } });
-      if (!supplier) throw new NotFoundError(`Supplier ${input.supplierId} not found`);
+      const supplier = await tx.supplier.findUnique({ where: { id: resolvedSupplier.id } });
+      if (!supplier) throw new NotFoundError(`Supplier ${resolvedSupplier.id} not found`);
 
       const warehouse = await tx.warehouse.findFirst({
         where: { isDefault: true },

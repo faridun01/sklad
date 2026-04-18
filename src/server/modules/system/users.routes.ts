@@ -8,7 +8,7 @@ import { auditService } from '../../services/audit.service';
 
 export const usersRouter = Router();
 
-const ALLOWED_ROLES = ['OWNER', 'ADMIN', 'CASHIER', 'PHARMACIST', 'WAREHOUSE_STAFF'] as const;
+const ALLOWED_ROLES = ['OWNER', 'ADMIN', 'CASHIER', 'WAREHOUSE_STAFF'] as const;
 type AllowedRole = typeof ALLOWED_ROLES[number];
 
 const normalizeEmail = (v: unknown) => String(v || '').trim().toLowerCase();

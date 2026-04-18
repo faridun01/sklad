@@ -100,7 +100,7 @@ returnsRouter.post('/', authenticate, asyncHandler(async (req, res) => {
 }));
 
 // PUT /:id/approve — PHARMACIST, ADMIN, OWNER
-returnsRouter.put('/:id/approve', authenticate, requireRole(['PHARMACIST', 'ADMIN', 'OWNER']), asyncHandler(async (req, res) => {
+returnsRouter.put('/:id/approve', authenticate, requireRole(['WAREHOUSE_STAFF', 'ADMIN', 'OWNER']), asyncHandler(async (req, res) => {
   const authedReq = req as AuthedRequest;
 
   const ret = await prisma.return.findUnique({
@@ -117,7 +117,7 @@ returnsRouter.put('/:id/approve', authenticate, requireRole(['PHARMACIST', 'ADMI
 }));
 
 // PUT /:id/reject — PHARMACIST, ADMIN, OWNER
-returnsRouter.put('/:id/reject', authenticate, requireRole(['PHARMACIST', 'ADMIN', 'OWNER']), asyncHandler(async (req, res) => {
+returnsRouter.put('/:id/reject', authenticate, requireRole(['WAREHOUSE_STAFF', 'ADMIN', 'OWNER']), asyncHandler(async (req, res) => {
   const authedReq = req as AuthedRequest;
 
   const ret = await prisma.return.findUnique({ where: { id: req.params.id }, select: { id: true, status: true } });

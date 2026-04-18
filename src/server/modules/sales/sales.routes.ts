@@ -29,14 +29,16 @@ salesRouter.post('/complete', authenticate, asyncHandler(async (req, res) => {
       quantity: Number(item.quantity),
       sellingPrice: Number(item.sellingPrice),
       discountAmount: item.discountAmount ? Number(item.discountAmount) : undefined,
-      prescriptionPresented: Boolean(item.prescriptionPresented),
     })),
     discountAmount: Number(discountAmount ?? 0),
     taxAmount: Number(taxAmount ?? 0),
     total: Number(total ?? 0),
     paymentType: mapPaymentType(paymentType),
     paidAmount: paidAmount == null ? undefined : Number(paidAmount),
+    customerId: req.body?.customerId ? String(req.body.customerId) : undefined,
     customerName: customerName ? String(customerName) : undefined,
+    customerPhone: req.body?.customerPhone ? String(req.body.customerPhone) : undefined,
+    customerAddress: req.body?.customerAddress ? String(req.body.customerAddress) : undefined,
     userId: authedReq.user.id,
   });
 
