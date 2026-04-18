@@ -84,5 +84,5 @@ for (const entry of processes) {
 }
 
 if (killed === 0) {
-  console.log('[free-prisma-lock] No PharmaPro Node/Electron processes were holding Prisma files');
+  console.log('[free-prisma-lock] No PharmaPro на Мой Склад Node/Electron processes were holding Prisma files');
 }

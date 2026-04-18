@@ -120,7 +120,7 @@ const ProductCatalog = memo(({
                     </div>
                     <div className="flex items-center gap-2.5 mt-0.5">
                       <span className="text-[9px] text-[#5A5A40]/40 uppercase tracking-widest">{product.sku}</span>
-                      <span className="text-[9px] text-[#5A5A40]/30 italic truncate max-w-[120px]">{product.manufacturer}</span>
+                      <span className="text-[9px] text-[#5A5A40]/30 italic truncate max-w-30">{product.manufacturer}</span>
                       <span className={`text-[9px] font-normal px-1.5 py-0.5 rounded-md ${lowStock ? 'bg-red-50 text-red-600' : 'bg-[#f5f5f0] text-[#5A5A40]/50'}`}>
                         {stockLabel}
                       </span>
@@ -147,12 +147,14 @@ const ProductCatalog = memo(({
 ProductCatalog.displayName = 'ProductCatalog';
 
 export const POSView: React.FC = () => {
-  const { products, refreshProducts, processTransaction, user } = usePharmacy();
+  const { products, refreshProducts, processTransaction, user, customers, refreshCustomers, createCustomer } = usePharmacy();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [barcodeInput, setBarcodeInput] = useState('');
   const [paymentType, setPaymentType] = useState<'CASH' | 'CARD' | 'CREDIT'>('CASH');
-  const [customerName, setCustomerName] = useState('');
+  const [customerId, setCustomerId] = useState('');
+  const [newCustomerName, setNewCustomerName] = useState('');
+  const [showAddCustomer, setShowAddCustomer] = useState(false);
   const [paidAmount, setPaidAmount] = useState<number>(0);
   const [processing, setProcessing] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -167,23 +169,21 @@ export const POSView: React.FC = () => {
   const barcodeInputRef = useRef<HTMLInputElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [barcodeScanning, setBarcodeScanning] = useState(false);
+
+  useEffect(() => { if (customers.length === 0) void refreshCustomers(); }, [customers.length, refreshCustomers]);
+
   const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
-
-  const alphabet = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЭЮЯ".split("");
-
-  const normalizedSearchTerm = useMemo(() => searchTerm.trim().toLowerCase(), [searchTerm]);
+  const normalizedSearchTerm = searchTerm.trim().toLowerCase();
   const cartProductIds = useMemo(() => new Set(cart.map((item) => item.id)), [cart]);
 
   const filteredProducts = useMemo(() => products.filter((product) => {
     if (product.totalStock <= 0) return false;
     if (cartProductIds.has(product.id)) return false;
-    
     const matchesSearch = (
       product.name.toLowerCase().includes(normalizedSearchTerm) ||
       product.sku.toLowerCase().includes(normalizedSearchTerm) ||
       String(product.barcode || '').toLowerCase().includes(normalizedSearchTerm)
     );
-
     if (selectedLetter) {
       return matchesSearch && product.name.toUpperCase().startsWith(selectedLetter);
     }
@@ -191,18 +191,6 @@ export const POSView: React.FC = () => {
   }), [products, normalizedSearchTerm, cartProductIds, selectedLetter]);
 
   const getCartItemKey = useCallback((item: Pick<CartItem, 'id' | 'batchId'>) => `${item.id}:${item.batchId || 'default'}`, []);
-  const findProductByScannedCode = useCallback((rawCode: string) => {
-    const normalize = (value: string) => value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
-    const normalizedCode = normalize(rawCode);
-    if (!normalizedCode) return null;
-    return (
-      products.find((product) => normalize(product.sku) === normalizedCode) ||
-      products.find((product) => normalize(product.barcode || '') === normalizedCode) ||
-      products.find((product) => normalize(product.id) === normalizedCode) ||
-      null
-    );
-  }, [products]);
-
   const addToCart = useCallback((product: Product) => {
     if (product.totalStock <= 0) {
       setError('Товар закончился на складе');
@@ -262,49 +250,6 @@ export const POSView: React.FC = () => {
 
   useEffect(() => { if (products.length === 0) void refreshProducts(); }, [products.length, refreshProducts]);
 
-  useEffect(() => {
-    let buffer = '';
-    let lastKeyTime = Date.now();
-    const handleKeyDown = (event: KeyboardEvent) => {
-      const currentTime = Date.now();
-      if (currentTime - lastKeyTime > 50) buffer = '';
-      if (event.key === 'Enter') {
-        if (buffer.length > 5) {
-          const product = findProductByScannedCode(buffer);
-          if (product) addToCart(product);
-          buffer = '';
-        }
-      } else if (event.key.length === 1) buffer += event.key;
-      lastKeyTime = currentTime;
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [addToCart, findProductByScannedCode]);
-
-  const handleBarcodeScan = useCallback(async (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key !== 'Enter') return;
-    const code = barcodeInput.trim();
-    if (!code) return;
-    const local = findProductByScannedCode(code);
-    if (local) {
-      addToCart(local);
-      setBarcodeInput('');
-    } else {
-      setBarcodeScanning(true);
-      setBarcodeInput('');
-      try {
-        const res = await fetch(`/api/products/barcode/${encodeURIComponent(code)}`, { headers: await buildApiHeaders(false) });
-        const body = await res.json().catch(() => ({}));
-        if (res.ok) { addToCart(body as Product); void refreshProducts(); }
-        else { setError(`Товар «${code}» не найден`); window.setTimeout(() => setError(null), 3000); }
-      } catch {
-        setError(`Ошибка сканирования`);
-        window.setTimeout(() => setError(null), 3000);
-      } finally { setBarcodeScanning(false); }
-    }
-    barcodeInputRef.current?.focus();
-  }, [addToCart, barcodeInput, findProductByScannedCode, refreshProducts]);
-
   const handleSearchKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter' && filteredProducts[0]) addToCart(filteredProducts[0]);
   };
@@ -330,9 +275,9 @@ export const POSView: React.FC = () => {
     if (cart.length === 0) return;
     const rxMissing = cart.find(it => it.prescription && !it.prescriptionPresented);
     if (rxMissing) return setError(`Для "${rxMissing.name}" нужен рецепт`);
-    if (paymentType === 'CREDIT' && !customerName.trim()) return setError('Имя клиента обязательно');
+    if (paymentType === 'CREDIT' && !customerId) return setError('Выберите клиента');
     if (!activeShift) return setError('Откройте смену');
-    
+
     setProcessing(true);
     try {
       await processTransaction({
@@ -347,21 +292,24 @@ export const POSView: React.FC = () => {
         taxAmount: 0,
         total,
         paymentType,
-        customerName: paymentType === 'CREDIT' ? customerName : undefined,
+        customerName: paymentType === 'CREDIT' ? getCustomerNameById(customerId) : undefined,
         paidAmount: paymentType === 'CREDIT' ? Number(paidAmount) : total,
         userId: user?.id || '',
         date: new Date(),
       });
       setSuccess(true);
       setCart([]);
-      setCustomerName('');
+      setCustomerId('');
       setPaidAmount(0);
-      void loadActiveShift();
-      window.setTimeout(() => setSuccess(false), 3000);
     } catch (err: any) {
-      setError(err.message || 'Ошибка продажи');
-    } finally { setProcessing(false); }
+      setError(err.message || 'Ошибка');
+    } finally {
+      setProcessing(false);
+    }
   };
+
+  // Для поиска имени клиента по id
+  const getCustomerNameById = (id: string) => customers.find(c => c.id === id)?.name || '';
 
   return (
     <>
@@ -373,17 +321,6 @@ export const POSView: React.FC = () => {
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#5A5A40]/30 group-focus-within:text-[#5A5A40] transition-colors" size={18} />
                 <input ref={searchInputRef} type="text" value={searchTerm} onChange={(e) => handleSearchChange(e.target.value)} onKeyDown={handleSearchKeyDown} placeholder="Поиск товара..." className="w-full pl-12 pr-4 py-3 bg-[#f5f5f0]/50 border-none rounded-2xl focus:ring-2 focus:ring-[#5A5A40]/20 transition-all text-sm outline-none" />
               </div>
-              <div className="relative group">
-                <Barcode className="absolute left-4 top-1/2 -translate-y-1/2 text-[#5A5A40]/30 group-focus-within:text-[#5A5A40] transition-colors" size={18} />
-                <input ref={barcodeInputRef} type="text" value={barcodeInput} onChange={(e) => setBarcodeInput(e.target.value)} onKeyDown={handleBarcodeScan} placeholder="Штрихкод..." className="w-full pl-12 pr-4 py-3 bg-[#f5f5f0]/50 border-none rounded-2xl focus:ring-2 focus:ring-[#5A5A40]/20 transition-all text-sm outline-none" />
-              </div>
-            </div>
-
-            <div className="flex items-center gap-1 overflow-x-auto pb-2 no-scrollbar custom-scrollbar">
-              <button onClick={() => setSelectedLetter(null)} className={`shrink-0 w-8 h-8 rounded-lg text-[10px] transition-all ${!selectedLetter ? 'bg-[#5A5A40] text-white shadow-sm' : 'bg-[#f5f5f0] text-[#5A5A40]/40 hover:bg-[#5A5A40]/10'}`}>Все</button>
-              {alphabet.map(char => (
-                <button key={char} onClick={() => setSelectedLetter(selectedLetter === char ? null : char)} className={`shrink-0 w-8 h-8 rounded-lg text-[10px] transition-all ${selectedLetter === char ? 'bg-[#5A5A40] text-white shadow-sm' : 'bg-[#f5f5f0] text-[#5A5A40]/40 hover:bg-[#5A5A40]/10'}`}>{char}</button>
-              ))}
             </div>
 
             <div className="flex items-center justify-between px-1">
@@ -473,8 +410,33 @@ export const POSView: React.FC = () => {
 
             {paymentType === 'CREDIT' && (
               <div className="space-y-2.5 animate-in fade-in zoom-in duration-300">
-                <input type="text" value={customerName} onChange={(e) => setCustomerName(e.target.value)} placeholder="Имя клиента..." className="w-full px-4 py-2.5 bg-white border border-[#5A5A40]/10 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#5A5A40]/5" />
+                <div className="flex gap-2">
+                  <select value={customerId} onChange={e => setCustomerId(e.target.value)} className="w-full px-4 py-2.5 bg-white border border-[#5A5A40]/10 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#5A5A40]/5">
+                    <option value="">Выберите клиента...</option>
+                    {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  </select>
+                  <button type="button" onClick={() => setShowAddCustomer(true)} className="px-3 py-2 text-xs rounded-xl bg-[#5A5A40] text-white">+</button>
+                </div>
                 <input type="number" value={paidAmount || ''} onChange={(e) => setPaidAmount(Number(e.target.value))} placeholder="Внесено (0.00)" className="w-full px-4 py-3 bg-[#f5f5f0]/30 border border-[#5A5A40]/10 rounded-xl text-sm font-normal text-[#151619] outline-none tabular-nums" />
+                {showAddCustomer && (
+                  <div className="mt-2 p-3 bg-[#f5f5f0]/80 rounded-xl border border-[#5A5A40]/10">
+                    <input type="text" value={newCustomerName} onChange={e => setNewCustomerName(e.target.value)} placeholder="Имя нового клиента" className="w-full px-3 py-2 rounded-lg border border-[#5A5A40]/20 text-xs mb-2" />
+                    <div className="flex gap-2">
+                      <button type="button" onClick={async () => {
+                        if (!newCustomerName.trim()) return;
+                        try {
+                          const created = await createCustomer({ name: newCustomerName });
+                          setCustomerId(created.id);
+                          setShowAddCustomer(false);
+                          setNewCustomerName('');
+                        } catch (err) {
+                          setError('Ошибка создания клиента');
+                        }
+                      }} className="px-3 py-2 rounded-xl bg-emerald-600 text-white text-xs">Сохранить</button>
+                      <button type="button" onClick={() => { setShowAddCustomer(false); setNewCustomerName(''); }} className="px-3 py-2 rounded-xl bg-[#5A5A40]/10 text-[#5A5A40] text-xs">Отмена</button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

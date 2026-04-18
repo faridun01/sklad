@@ -125,5 +125,5 @@ export const exportReportToXlsx = async (report: FinanceReport, viewMode: Report
     XLSX.utils.book_append_sheet(wb, inventorySheet, 'Склад');
   }
 
-  XLSX.writeFile(wb, `PharmaPro_Detailed_Report_${new Date().toISOString().slice(0, 10)}.xlsx`);
+  XLSX.writeFile(wb, `Мой Склад_Detailed_Report_${new Date().toISOString().slice(0, 10)}.xlsx`);
 };

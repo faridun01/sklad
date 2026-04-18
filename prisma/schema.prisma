@@ -665,11 +665,12 @@ model PurchaseInvoiceItem {
   product           Product         @relation(fields: [productId], references: [id])
   batchNumber       String?
   manufacturedDate  DateTime?
-  expiryDate        DateTime?
   quantity          Int
-  purchasePrice     Float
-  wholesalePrice    Float?
-  retailPrice       Float?
+  unitsInPack       Int             @default(1) // Штук в коробке
+  totalUnits        Int             @default(0) // Всего штук (quantity * unitsInPack)
+  packPrice         Float           @default(0) // Цена за упаковку
+  unitPrice         Float           @default(0) // Цена за штуку
+  total             Float           @default(0) // Сумма
   lineDiscount      Float           @default(0)
   lineTotal         Float           @default(0)
   batches           Batch[]

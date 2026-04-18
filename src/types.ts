@@ -231,7 +231,7 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
   {
     id: '3',
     title: 'System Update',
-    message: 'PharmaPro v2.4.0 successfully deployed.',
+    message: 'Мой Склад v2.4.0 successfully deployed.',
     time: '1 day ago',
     type: 'system',
     read: true

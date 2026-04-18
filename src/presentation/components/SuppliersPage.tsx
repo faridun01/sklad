@@ -214,7 +214,7 @@ export const SuppliersPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-[1600px] mx-auto space-y-8 animate-in fade-in duration-700 pb-20">
+    <div className="max-w-400 mx-auto space-y-8 animate-in fade-in duration-700 pb-20">
       {/* Header Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
@@ -223,7 +223,7 @@ export const SuppliersPage: React.FC = () => {
           { label: 'Текущий долг', val: formatMoney(totalDebt), sub: 'Сумма к оплате', color: 'text-red-500' },
           { label: 'Просрочено', val: formatMoney(totalOverdue), sub: 'Критические задолж.', color: 'text-amber-600' },
         ].map((card, idx) => (
-          <div key={idx} className="bg-white/40 border border-[#5A5A40]/5 rounded-[2rem] p-6 shadow-sm hover:shadow-xl hover:shadow-[#5A5A40]/5 transition-all group">
+          <div key={idx} className="bg-white/40 border border-[#5A5A40]/5 rounded-4xl p-6 shadow-sm hover:shadow-xl hover:shadow-[#5A5A40]/5 transition-all group">
             <p className="text-[10px] font-normal text-[#5A5A40]/40 uppercase tracking-[0.2em] mb-1">{card.label}</p>
             <p className={`text-2xl font-normal ${card.color} tracking-tight group-hover:tracking-tighter transition-all`}>{card.val}</p>
             <p className="text-[10px] font-normal text-[#5A5A40]/30 mt-2 italic">{card.sub}</p>
@@ -270,11 +270,11 @@ export const SuppliersPage: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {initialLoadPending ? (
           Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-64 bg-white/40 border border-[#5A5A40]/5 rounded-[2rem] animate-pulse" />
+            <div key={i} className="h-64 bg-white/40 border border-[#5A5A40]/5 rounded-4xl animate-pulse" />
           ))
         ) : filteredSuppliers.length === 0 ? (
           <div className="col-span-full py-24 text-center">
-            <div className="w-20 h-20 bg-[#5A5A40]/5 rounded-[2rem] mx-auto flex items-center justify-center text-[#5A5A40]/20 mb-4">
+            <div className="w-20 h-20 bg-[#5A5A40]/5 rounded-4xl mx-auto flex items-center justify-center text-[#5A5A40]/20 mb-4">
               <Truck size={40} />
             </div>
             <p className="text-sm text-[#5A5A40]/40 font-normal italic">Список пуст</p>
@@ -287,7 +287,7 @@ export const SuppliersPage: React.FC = () => {
               <div
                 key={s.id}
                 onClick={() => setOpenSupplierId(s.id)}
-                className="group bg-white/40 hover:bg-white border border-[#5A5A40]/5 rounded-[2rem] p-6 transition-all hover:shadow-2xl hover:shadow-[#5A5A40]/5 cursor-pointer flex flex-col h-full"
+                className="group bg-white/40 hover:bg-white border border-[#5A5A40]/5 rounded-4xl p-6 transition-all hover:shadow-2xl hover:shadow-[#5A5A40]/5 cursor-pointer flex flex-col h-full"
               >
                 <div className="flex justify-between items-start mb-6">
                   <div className="w-14 h-14 rounded-3xl bg-[#f5f5f0] flex items-center justify-center text-[#5A5A40]/30 group-hover:bg-[#5A5A40] group-hover:text-white transition-all shadow-inner">
@@ -350,13 +350,13 @@ export const SuppliersPage: React.FC = () => {
 
       {/* Details Modal */}
       {openSupplierId && selectedSupplier && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#151619]/60 backdrop-blur-xl p-4 animate-in fade-in zoom-in duration-300">
+        <div className="fixed inset-0 z-60 flex items-center justify-center bg-[#151619]/60 backdrop-blur-xl p-4 animate-in fade-in zoom-in duration-300">
           <div className="bg-[#f8f7f2] rounded-[3rem] shadow-2xl w-full max-w-6xl h-[90vh] flex flex-col overflow-hidden border border-white/20 relative">
             
             {/* Modal Header */}
             <div className="p-8 pb-4 flex items-center justify-between z-20">
               <div className="flex items-center gap-5">
-                <div className="w-16 h-16 rounded-[2rem] bg-[#5A5A40] text-white flex items-center justify-center shadow-lg shadow-[#5A5A40]/20 transition-transform active:scale-95 cursor-pointer" onClick={() => void loadSupplierDetails(openSupplierId, true)}>
+                <div className="w-16 h-16 rounded-4xl bg-[#5A5A40] text-white flex items-center justify-center shadow-lg shadow-[#5A5A40]/20 transition-transform active:scale-95 cursor-pointer" onClick={() => void loadSupplierDetails(openSupplierId, true)}>
                   {detailLoading ? <RefreshCw size={28} className="animate-spin" /> : <Truck size={32} />}
                 </div>
                 <div>
@@ -374,7 +374,7 @@ export const SuppliersPage: React.FC = () => {
               
               {/* Internal Loader overlay */}
               {detailLoading && !selectedStats?.invoices && (
-                <div className="absolute inset-0 bg-[#f8f7f2]/50 backdrop-blur-[2px] z-[30] flex flex-col items-center justify-center">
+                <div className="absolute inset-0 bg-[#f8f7f2]/50 backdrop-blur-[2px] z-30 flex flex-col items-center justify-center">
                   <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-[#5A5A40]/30 mb-4" />
                   <p className="text-[10px] uppercase tracking-[0.3em] text-[#5A5A40]/40 font-normal">Синхронизация данных...</p>
                 </div>
@@ -388,7 +388,7 @@ export const SuppliersPage: React.FC = () => {
                   { label: 'Долг', val: formatMoney(selectedStats?.summary?.totalDebt || 0), icon: <CreditCard size={16}/>, color: 'text-red-500' },
                   { label: 'На проверке', val: formatMoney(selectedStats?.summary?.overdueDebt || 0), icon: <AlertTriangle size={16}/>, color: 'text-amber-600' },
                 ].map((s, i) => (
-                  <div key={i} className="bg-white border border-[#5A5A40]/5 rounded-[2rem] p-5 shadow-sm">
+                  <div key={i} className="bg-white border border-[#5A5A40]/5 rounded-4xl p-5 shadow-sm">
                     <div className="flex items-center gap-2 mb-3 opacity-30">
                       {s.icon} <span className="text-[9px] uppercase tracking-widest font-normal">{s.label}</span>
                     </div>
@@ -403,7 +403,7 @@ export const SuppliersPage: React.FC = () => {
                   <h4 className="text-sm font-normal text-[#151619] tracking-tight">История накладных</h4>
                   <span className="text-[9px] uppercase tracking-widest text-[#5A5A40]/30 font-normal italic">Всего записей: {(selectedStats?.invoices || []).length}</span>
                 </div>
-                <div className="bg-white rounded-[2rem] border border-[#5A5A40]/10 overflow-hidden shadow-sm">
+                <div className="bg-white rounded-4xl border border-[#5A5A40]/10 overflow-hidden shadow-sm">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-[#f5f5f0]/50 text-[10px] uppercase tracking-widest text-[#5A5A40]/40 border-b border-[#5A5A40]/5">
@@ -488,7 +488,7 @@ export const SuppliersPage: React.FC = () => {
                   <h4 className="text-sm font-normal text-[#151619] tracking-tight">История платежей</h4>
                   <span className="text-[9px] uppercase tracking-widest text-[#5A5A40]/30 font-normal italic">Транзакций: {(selectedStats?.payments || []).length}</span>
                 </div>
-                <div className="bg-white rounded-[2rem] border border-[#5A5A40]/10 overflow-hidden shadow-sm">
+                <div className="bg-white rounded-4xl border border-[#5A5A40]/10 overflow-hidden shadow-sm">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-[#f5f5f0]/50 text-[10px] uppercase tracking-widest text-[#5A5A40]/40 border-b border-[#5A5A40]/5">
@@ -521,7 +521,7 @@ export const SuppliersPage: React.FC = () => {
 
       {/* Add/Edit Modal */}
       {isAddOpen && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-[#151619]/60 backdrop-blur-xl p-4 animate-in fade-in zoom-in duration-300">
+        <div className="fixed inset-0 z-70 flex items-center justify-center bg-[#151619]/60 backdrop-blur-xl p-4 animate-in fade-in zoom-in duration-300">
           <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-lg overflow-hidden border border-[#5A5A40]/10">
             <div className="p-8 border-b border-[#5A5A40]/5 flex items-center justify-between">
               <div>
@@ -552,7 +552,7 @@ export const SuppliersPage: React.FC = () => {
             </div>
             <div className="p-8 pt-0 flex gap-3">
               <button onClick={() => setIsAddOpen(false)} className="flex-1 py-4 border border-[#5A5A40]/10 rounded-2xl text-sm font-normal text-[#5A5A40]/40 hover:bg-[#f5f5f0] transition-all">Отмена</button>
-              <button onClick={saveSupplier} disabled={submitting} className="flex-[2] py-4 bg-[#5A5A40] text-white rounded-2xl text-sm font-normal hover:bg-[#4A4A30] active:scale-95 transition-all disabled:opacity-50 shadow-lg shadow-[#5A5A40]/20">{submitting ? '...' : 'Сохранить изменения'}</button>
+              <button onClick={saveSupplier} disabled={submitting} className="flex-2 py-4 bg-[#5A5A40] text-white rounded-2xl text-sm font-normal hover:bg-[#4A4A30] active:scale-95 transition-all disabled:opacity-50 shadow-lg shadow-[#5A5A40]/20">{submitting ? '...' : 'Сохранить изменения'}</button>
             </div>
           </div>
         </div>
@@ -560,8 +560,8 @@ export const SuppliersPage: React.FC = () => {
 
       {/* Delete Modal */}
       {deleteTarget && (
-        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-[#151619]/40 backdrop-blur-md p-4 animate-in fade-in duration-300">
-          <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-sm overflow-hidden border border-red-50">
+        <div className="fixed inset-0 z-80 flex items-center justify-center bg-[#151619]/40 backdrop-blur-md p-4 animate-in fade-in duration-300">
+          <div className="bg-white rounded-4xl shadow-2xl w-full max-w-sm overflow-hidden border border-red-50">
             <div className="p-8 text-center space-y-4">
               <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center text-red-500 mx-auto mb-2 animate-bounce"><Trash2 size={30} /></div>
               <h3 className="text-xl font-normal text-[#151619] tracking-tight">Удалить партнера?</h3>

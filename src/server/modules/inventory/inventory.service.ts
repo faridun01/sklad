@@ -20,7 +20,12 @@ export type RestockItemInput = {
 export type PurchaseInvoiceImportItemInput = {
   productId: string;
   batchNumber: string;
-  quantity: number;
+  quantity: number; // коробки
+  unitsInPack: number; // штук в коробке
+  totalUnits: number; // всего штук
+  packPrice: number; // цена за упаковку
+  unitPrice: number; // цена за штуку (берём из таблицы)
+  total: number; // сумма
   unit: string;
   costBasis: number;
   wholesalePrice?: number | null;
@@ -360,7 +365,7 @@ export class InventoryService {
         throw new ValidationError(`Purchase invoice ${invoiceNumber} already exists`);
       }
 
-      const grossTotal = round(input.items.reduce((sum, item) => sum + (Number(item.costBasis) * Number(item.quantity)), 0));
+      const grossTotal = round(input.items.reduce((sum, item) => sum + Number(item.total || 0), 0));
       const discountAmount = round(input.discountAmount ?? 0);
       const taxAmount = round(input.taxAmount ?? 0);
       const totalAmount = round(Math.max(0, grossTotal - discountAmount + taxAmount));
@@ -394,11 +399,13 @@ export class InventoryService {
               productId: item.productId,
               batchNumber: item.batchNumber,
               manufacturedDate: item.manufacturedDate,
-              expiryDate: item.expiryDate,
-              quantity: item.quantity,
-              purchasePrice: item.costBasis,
-              wholesalePrice: item.wholesalePrice ?? null,
-              lineTotal: Number(item.costBasis) * Number(item.quantity),
+              quantity: item.quantity, // коробки
+              unitsInPack: item.unitsInPack,
+              totalUnits: item.totalUnits,
+              packPrice: item.packPrice,
+              unitPrice: item.unitPrice, // Брать из таблицы!
+              total: item.total,
+              lineTotal: item.total,
             },
           });
         }
@@ -684,10 +691,14 @@ export class InventoryService {
     if (!product) throw new NotFoundError(`Product ${item.productId} not found`);
 
     // Normalize price: might be costBasis (from manual input) or purchasePrice (from DB record)
-    const rawPrice = item.costBasis ?? item.purchasePrice ?? 0;
+    const rawPrice = item.unitPrice ?? item.costBasis ?? item.purchasePrice ?? 0;
     const price = Number.isFinite(Number(rawPrice)) ? Number(rawPrice) : 0;
-    const qty = Number(item.quantity) || 0;
+    const boxQty = Number(item.quantity) || 0;
+    const unitsInPack = Math.max(1, Number(item.unitsInPack) || 1);
+    const qty = Number(item.totalUnits) || (boxQty * unitsInPack);
     const batchNo = String(item.batchNumber || 'MISSING');
+    const packPrice = Number(item.packPrice) || (price * unitsInPack);
+    const lineTotal = Number(item.total) || (boxQty * packPrice);
 
     const purchaseItem = await tx.purchaseInvoiceItem.findFirst({
         where: { purchaseInvoiceId: invoice.id, productId: product.id, batchNumber: batchNo }
@@ -697,11 +708,13 @@ export class InventoryService {
         productId: product.id,
         batchNumber: batchNo,
         manufacturedDate: item.manufacturedDate || new Date(),
-        expiryDate: item.expiryDate || new Date(),
-        quantity: qty,
-        purchasePrice: price,
-        wholesalePrice: Number(item.wholesalePrice) || null,
-        lineTotal: price * qty,
+        quantity: boxQty,
+        unitsInPack,
+        totalUnits: qty,
+        packPrice,
+        unitPrice: price,
+        total: lineTotal,
+        lineTotal,
       },
     });
 
@@ -741,14 +754,14 @@ export class InventoryService {
 
     await tx.warehouseStock.upsert({
       where: { warehouseId_productId: { warehouseId, productId: product.id } },
-      update: { quantity: { increment: item.quantity } },
-      create: { warehouseId, productId: product.id, quantity: item.quantity },
+      update: { quantity: { increment: qty } },
+      create: { warehouseId, productId: product.id, quantity: qty },
     });
 
     const updatedProduct = await tx.product.update({
       where: { id: product.id },
       data: {
-        totalStock: { increment: item.quantity },
+        totalStock: { increment: qty },
         costPrice: price,
       },
     });

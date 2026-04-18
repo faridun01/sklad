@@ -256,12 +256,12 @@ export const ReturnView: React.FC = () => {
   }), [filteredReturns]);
 
   return (
-    <div className="max-w-[1600px] mx-auto space-y-8 pb-12 animate-in fade-in duration-700 font-normal">
+    <div className="max-w-400 mx-auto space-y-8 pb-12 animate-in fade-in duration-700 font-normal">
       
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-1">
         <div className="flex items-center gap-5">
-           <div className="w-14 h-14 rounded-[1.5rem] bg-[#fcfbf7] border border-[#5A5A40]/5 flex items-center justify-center text-[#5A5A40]/60 shadow-sm">
+           <div className="w-14 h-14 rounded-3xl bg-[#fcfbf7] border border-[#5A5A40]/5 flex items-center justify-center text-[#5A5A40]/60 shadow-sm">
              <RefreshCw size={26} />
            </div>
            <div>

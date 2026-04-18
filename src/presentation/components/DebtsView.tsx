@@ -77,7 +77,7 @@ export const DebtsView: React.FC = () => {
     }
   };
 
-  // Group debts by customer
+  // Группировка по клиенту
   const groupedDebts = useMemo(() => {
     const groups: Record<string, { 
       customer: string; 
@@ -89,7 +89,7 @@ export const DebtsView: React.FC = () => {
     }> = {};
 
     debts.forEach(debt => {
-      const name = debt.customer || 'Аноним';
+      const name = debt.customer || 'Анонимный клиент';
       if (!groups[name]) {
         groups[name] = { 
           customer: name, 
@@ -124,7 +124,7 @@ export const DebtsView: React.FC = () => {
     }).sort((a, b) => b.lastActivity.getTime() - a.lastActivity.getTime());
   }, [debts, searchTerm, filter]);
 
-  // Full summary calculated from current data to avoid discrepancies
+  // Полная сводка по клиентам
   const calculatedSummary = useMemo(() => {
     let debt = 0;
     let unpaid = 0;
@@ -161,7 +161,7 @@ export const DebtsView: React.FC = () => {
               <AlertCircle size={20} />
             </div>
           </div>
-          <h3 className="text-[#5A5A40]/50 text-[10px] font-black uppercase tracking-widest mb-1">Общий долг</h3>
+          <h3 className="text-[#5A5A40]/50 text-[10px] font-black uppercase tracking-widest mb-1">Общий баланс</h3>
           <p className="text-2xl font-black text-[#5A5A40] tabular-nums">{calculatedSummary.totalDebt.toFixed(2)} TJS</p>
         </div>
 
@@ -223,7 +223,7 @@ export const DebtsView: React.FC = () => {
         </div>
       </div>
 
-      {/* Main List - Grouped by Customer */}
+      {/* Основной список — по клиентам */}
       <div className="grid grid-cols-1 gap-4">
         {loading ? (
           <div className="py-20 flex flex-col items-center justify-center gap-4 bg-white rounded-[40px] border border-[#5A5A40]/5 shadow-sm">
@@ -266,7 +266,7 @@ export const DebtsView: React.FC = () => {
 
               {expandedCustomer === group.customer && (
                 <div className="bg-[#f5f5f0]/30 border-t border-[#5A5A40]/5 px-8 py-6 space-y-3 animate-in slide-in-from-top-2 duration-300">
-                  <h5 className="text-[10px] font-black uppercase tracking-widest text-[#5A5A40]/30 mb-4">Список накладных (долгов)</h5>
+                  <h5 className="text-[10px] font-black uppercase tracking-widest text-[#5A5A40]/30 mb-4">Список накладных клиента</h5>
                   {group.invoices.sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((invoice) => (
                     <div key={invoice.id} className="bg-white p-5 rounded-2xl border border-[#5A5A40]/5 flex items-center justify-between gap-4">
                       <div className="flex flex-col">
@@ -308,8 +308,8 @@ export const DebtsView: React.FC = () => {
             <div className="w-20 h-20 bg-[#f5f5f0] rounded-[32px] flex items-center justify-center text-[#5A5A40]/20 mb-6">
               <CheckCircle2 size={40} />
             </div>
-            <h3 className="text-xl font-bold text-[#5A5A40] mb-2">Активных долгов не найдено</h3>
-            <p className="text-sm text-[#5A5A40]/40 mb-8 max-w-xs mx-auto">Все текущие продажи оплачены или фильтр скрывает записи.</p>
+            <h3 className="text-xl font-bold text-[#5A5A40] mb-2">Нет клиентов с долгом</h3>
+            <p className="text-sm text-[#5A5A40]/40 mb-8 max-w-xs mx-auto">Все текущие продажи клиентами оплачены или фильтр скрывает записи.</p>
           </div>
         )}
       </div>
@@ -320,7 +320,7 @@ export const DebtsView: React.FC = () => {
           <div className="bg-white rounded-[40px] shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-300 border border-[#5A5A40]/5">
             <div className="p-8 border-b border-[#5A5A40]/5 flex items-center justify-between">
               <div>
-                <h3 className="text-xl font-black text-[#5A5A40] tracking-tight">Погашение долга</h3>
+                <h3 className="text-xl font-black text-[#5A5A40] tracking-tight">Оплата клиента</h3>
                 <p className="text-[10px] text-[#5A5A40]/40 uppercase tracking-widest mt-1 font-black">Чек: {paymentModal.invoiceNo}</p>
               </div>
               <button onClick={() => setPaymentModal(null)} className="p-2 hover:bg-[#f5f5f0] rounded-full text-[#5A5A40]/20 hover:text-[#5A5A40] transition-colors"><X size={24} /></button>

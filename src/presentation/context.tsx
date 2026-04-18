@@ -1,29 +1,22 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { Product, User, Invoice, Supplier } from '../core/domain';
 import { TransactionDTO } from '../application/services';
 import { ApiProductRepository, ApiInvoiceRepository, ApiSupplierRepository, buildApiHeaders } from '../infrastructure/api';
 import { ConsoleLogger } from '../infrastructure/persistence';
 import { runRefreshTasks } from '../lib/utils';
 
-/**
- * Cache strategy for reference data (rarely changed)
- */
 interface CacheEntry<T> {
   data: T;
   timestamp: number;
 }
 
-/**
- * Dependency Injection Container / Context
- * Strategy: Separate operational data (products) from slower-changing reference data (suppliers)
- * - products: fully cached, auto-refresh on user action
- * - invoices: lazy-loaded on demand (not cached in context)
- * - suppliers: cached with 30min TTL
- */
 interface PharmacyContextType {
   products: Product[];
-  invoices: Invoice[]; // Only recent invoices; use API pagination for historical
+  invoices: Invoice[];
   suppliers: Supplier[];
+  customers: any[];
+  refreshCustomers: (force?: boolean) => Promise<void>;
+  createCustomer: (payload: { name: string; phone?: string; email?: string; }) => Promise<any>;
   user: User | null;
   isLoading: boolean;
   error: string | null;
@@ -48,11 +41,17 @@ interface PharmacyContextType {
     invoiceNumber: string;
     invoiceDate: string;
     discountAmount?: number;
+    taxAmount?: number;
     status?: 'DRAFT' | 'POSTED';
     items: Array<{
       productId: string;
       batchNumber: string;
       quantity: number;
+      unitsInPack: number;
+      totalUnits: number;
+      packPrice: number;
+      unitPrice: number;
+      total: number;
       unit: string;
       costBasis: number;
       manufacturedDate: Date;
@@ -75,8 +74,9 @@ const getBootstrapLoadKey = (user: User | null) => {
 
 export const PharmacyProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [invoices, setInvoices] = useState<Invoice[]>([]); // Only recent, not all-time
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [customers, setCustomers] = useState<any[]>([]);
   const [user, setUser] = useState<User | null>(() => {
     const saved = window.sessionStorage.getItem('pharmapro_user');
     if (!saved) return null;
@@ -89,17 +89,14 @@ export const PharmacyProvider: React.FC<{ children: ReactNode }> = ({ children }
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Cache for reference data (suppliers)
-  // TTL: 30 minutes for suppliers
   const cacheRef = React.useRef<{
     suppliers: CacheEntry<Supplier[]> | null;
   }>({
     suppliers: null,
   });
 
-  const CACHE_TTL = 30 * 60 * 1000; // 30 minutes in milliseconds
+  const CACHE_TTL = 30 * 60 * 1000;
 
-  // Initialize Infrastructure (Singletons)
   const productRepository = new ApiProductRepository();
   const invoiceRepository = new ApiInvoiceRepository();
   const supplierRepository = new ApiSupplierRepository();
@@ -111,17 +108,16 @@ export const PharmacyProvider: React.FC<{ children: ReactNode }> = ({ children }
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ login, password })
+        body: JSON.stringify({ login, password }),
       });
       const payload = await response.json().catch(() => null);
       if (!response.ok) {
         throw new Error(payload?.error || (response.status === 401 ? 'Invalid credentials' : 'Login failed'));
       }
-      const data = payload;
-      window.sessionStorage.setItem('pharmapro_token', data.token);
-      window.sessionStorage.setItem('pharmapro_user', JSON.stringify(data.user));
-      localStorage.setItem('pharmapro_token', data.token);
-      setUser(data.user);
+      window.sessionStorage.setItem('pharmapro_token', payload.token);
+      window.sessionStorage.setItem('pharmapro_user', JSON.stringify(payload.user));
+      localStorage.setItem('pharmapro_token', payload.token);
+      setUser(payload.user);
     } catch (err: any) {
       setError(err.message);
       throw err;
@@ -160,13 +156,11 @@ export const PharmacyProvider: React.FC<{ children: ReactNode }> = ({ children }
       const now = Date.now();
       const cached = cacheRef.current.suppliers;
 
-      // Return cached data if valid and not forced
       if (!force && cached && (now - cached.timestamp) < CACHE_TTL) {
         setSuppliers(cached.data);
         return;
       }
 
-      // Fetch fresh data
       const data = await supplierRepository.getAll();
       const safeData = Array.isArray(data) ? data : ((data as any)?.items || []);
       cacheRef.current.suppliers = { data: safeData, timestamp: now };
@@ -174,6 +168,28 @@ export const PharmacyProvider: React.FC<{ children: ReactNode }> = ({ children }
     } catch (err: any) {
       logger.error('Failed to fetch suppliers', err);
     }
+  };
+
+  const refreshCustomers = async (_force: boolean = false) => {
+    try {
+      const response = await fetch('/api/customers', { headers: await buildApiHeaders() });
+      const data = await response.json();
+      setCustomers(Array.isArray(data.items) ? data.items : []);
+    } catch {
+      setCustomers([]);
+    }
+  };
+
+  const createCustomer = async (payload: { name: string; phone?: string; email?: string; }) => {
+    const response = await fetch('/api/customers', {
+      method: 'POST',
+      headers: await buildApiHeaders(),
+      body: JSON.stringify(payload),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Ошибка создания клиента');
+    await refreshCustomers(true);
+    return data;
   };
 
   const processTransaction = async (transaction: TransactionDTO) => {
@@ -196,9 +212,9 @@ export const PharmacyProvider: React.FC<{ children: ReactNode }> = ({ children }
 
       await runRefreshTasks(refreshProducts, refreshInvoices);
       return invoice;
-    } catch (error) {
-      logger.error('Transaction failed', error);
-      throw error;
+    } catch (err) {
+      logger.error('Transaction failed', err);
+      throw err;
     }
   };
 
@@ -229,11 +245,17 @@ export const PharmacyProvider: React.FC<{ children: ReactNode }> = ({ children }
     invoiceNumber: string;
     invoiceDate: string;
     discountAmount?: number;
+    taxAmount?: number;
     status?: 'DRAFT' | 'POSTED';
     items: Array<{
       productId: string;
       batchNumber: string;
       quantity: number;
+      unitsInPack: number;
+      totalUnits: number;
+      packPrice: number;
+      unitPrice: number;
+      total: number;
       unit: string;
       costBasis: number;
       manufacturedDate: Date;
@@ -254,7 +276,7 @@ export const PharmacyProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   const createProduct = async (payload: Omit<Product, 'batches' | 'totalStock' | 'status'> & { minStock?: number; batchData?: any }) => {
     const batchData = (payload as any).batchData;
-    
+
     const productToCreate: any = {
       name: payload.name,
       sku: payload.sku,
@@ -272,7 +294,6 @@ export const PharmacyProvider: React.FC<{ children: ReactNode }> = ({ children }
       analogs: payload.analogs,
     };
 
-    // If batch data provided, create with initial batch
     if (batchData && batchData.expiryDate) {
       productToCreate.batches = [
         {
@@ -288,7 +309,7 @@ export const PharmacyProvider: React.FC<{ children: ReactNode }> = ({ children }
           expiryDate: batchData.expiryDate,
           status: 'STABLE',
           movements: [],
-        }
+        },
       ];
     }
 
@@ -322,7 +343,6 @@ export const PharmacyProvider: React.FC<{ children: ReactNode }> = ({ children }
         return;
       }
 
-      // Proactive Theme Loading for Premium Feel
       const applyTheme = (theme: string) => {
         document.documentElement.dataset.theme = theme;
         if (theme === 'dark') {
@@ -332,15 +352,14 @@ export const PharmacyProvider: React.FC<{ children: ReactNode }> = ({ children }
         }
       };
 
-      // Load initial theme from server-side preferences
       void fetch('/api/system/me/preferences', { headers: await buildApiHeaders(false) })
-        .then(res => res.json())
-        .then(prefs => {
-           if (prefs?.appearance?.theme) {
-             applyTheme(prefs.appearance.theme);
-           }
+        .then((res) => res.json())
+        .then((prefs) => {
+          if (prefs?.appearance?.theme) {
+            applyTheme(prefs.appearance.theme);
+          }
         })
-        .catch(() => { /* use default if failed */ });
+        .catch(() => {});
 
       setIsLoading(false);
 
@@ -350,9 +369,9 @@ export const PharmacyProvider: React.FC<{ children: ReactNode }> = ({ children }
           refreshProducts,
           refreshInvoices,
           refreshSuppliers,
-        ).catch((error) => {
+        ).catch((err) => {
           bootstrapLoads.delete(loadKey);
-          throw error;
+          throw err;
         });
         bootstrapLoads.set(loadKey, bootstrapPromise);
       }
@@ -372,12 +391,15 @@ export const PharmacyProvider: React.FC<{ children: ReactNode }> = ({ children }
   }, [user]);
 
   return (
-    <PharmacyContext.Provider value={{ 
-      products, 
+    <PharmacyContext.Provider value={{
+      products,
       invoices,
       suppliers,
+      customers,
+      refreshCustomers,
+      createCustomer,
       user,
-      isLoading, 
+      isLoading,
       error,
       login,
       logout,
@@ -389,8 +411,9 @@ export const PharmacyProvider: React.FC<{ children: ReactNode }> = ({ children }
       importPurchaseInvoice,
       createProduct,
       updateProduct,
-      deleteProduct
-    }}>
+      deleteProduct,
+    }}
+    >
       {children}
     </PharmacyContext.Provider>
   );

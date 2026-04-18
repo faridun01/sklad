@@ -110,7 +110,7 @@ export const PurchasesView: React.FC = () => {
 
       {/* Stats Summary */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-[2rem] p-5 border border-[#5A5A40]/5 shadow-sm">
+        <div className="bg-white rounded-4xl p-5 border border-[#5A5A40]/5 shadow-sm">
           <div className="flex items-center gap-3 mb-3 text-amber-600">
             <Clock size={16} />
             <span className="text-[10px] font-bold uppercase tracking-widest">Ожидают приёмки</span>
@@ -118,7 +118,7 @@ export const PurchasesView: React.FC = () => {
           <p className="text-2xl font-black text-[#5A5A40]">{stats.draftCount}</p>
           <p className="text-xs text-[#5A5A40]/50 mt-1">на сумму {stats.draftSum.toFixed(2)} TJS</p>
         </div>
-        <div className="bg-white rounded-[2rem] p-5 border border-[#5A5A40]/5 shadow-sm">
+        <div className="bg-white rounded-4xl p-5 border border-[#5A5A40]/5 shadow-sm">
           <div className="flex items-center gap-3 mb-3 text-emerald-600">
             <CheckCircle2 size={16} />
             <span className="text-[10px] font-bold uppercase tracking-widest">Принято всего</span>
@@ -126,7 +126,7 @@ export const PurchasesView: React.FC = () => {
           <p className="text-2xl font-black text-[#5A5A40]">{stats.postedCount}</p>
           <p className="text-xs text-[#5A5A40]/50 mt-1">на сумму {stats.postedSum.toFixed(2)} TJS</p>
         </div>
-        <div className="bg-[#151619] rounded-[2rem] p-5 shadow-xl lg:col-span-2 text-white overflow-hidden relative group">
+        <div className="bg-[#151619] rounded-4xl p-5 shadow-xl lg:col-span-2 text-white overflow-hidden relative group">
            <div className="absolute -right-12 -top-12 w-48 h-48 bg-white/5 rounded-full blur-3xl group-hover:scale-125 transition-transform" />
            <div className="relative z-10 flex h-full items-center justify-between">
               <div>
@@ -283,19 +283,19 @@ export const PurchasesView: React.FC = () => {
             {/* Modal Content */}
             <div className="p-10 overflow-y-auto custom-scrollbar flex-1 space-y-8">
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="p-6 bg-white rounded-[2rem] border border-[#5A5A40]/5 shadow-sm">
+                <div className="p-6 bg-white rounded-4xl border border-[#5A5A40]/5 shadow-sm">
                   <p className="text-[10px] font-black text-[#5A5A40]/30 uppercase tracking-[0.2em] mb-2">Сумма Итого</p>
                   <p className="text-2xl font-black text-[#5A5A40]">{Number(selectedInvoice.totalAmount).toLocaleString()}</p>
                 </div>
-                <div className="p-6 bg-white rounded-[2rem] border border-[#5A5A40]/5 shadow-sm">
+                <div className="p-6 bg-white rounded-4xl border border-[#5A5A40]/5 shadow-sm">
                   <p className="text-[10px] font-black text-[#5A5A40]/30 uppercase tracking-[0.2em] mb-2">Налог / Скидка</p>
                   <p className="text-xs font-bold text-[#5A5A40]">{Number(selectedInvoice.taxAmount).toFixed(2)} / {Number(selectedInvoice.discountAmount).toFixed(2)}</p>
                 </div>
-                <div className="p-6 bg-white rounded-[2rem] border border-[#5A5A40]/5 shadow-sm">
+                <div className="p-6 bg-white rounded-4xl border border-[#5A5A40]/5 shadow-sm">
                   <p className="text-[10px] font-black text-[#5A5A40]/30 uppercase tracking-[0.2em] mb-2">Точек приёмки</p>
                   <p className="text-xs font-bold text-[#5A5A40]">{selectedInvoice.warehouse?.name || 'Основной склад'}</p>
                 </div>
-                <div className="p-6 bg-white rounded-[2rem] border border-[#5A5A40]/5 shadow-sm">
+                <div className="p-6 bg-white rounded-4xl border border-[#5A5A40]/5 shadow-sm">
                   <p className="text-[10px] font-black text-[#5A5A40]/30 uppercase tracking-[0.2em] mb-2">Дата создания</p>
                   <p className="text-xs font-bold text-[#5A5A40]">{new Date(selectedInvoice.createdAt).toLocaleString()}</p>
                 </div>
@@ -387,8 +387,8 @@ export const PurchasesView: React.FC = () => {
 
       {/* Beautiful Confirmation Modal */}
       {confirmModal.isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-[#000]/60 backdrop-blur-md animate-in fade-in duration-500" onClick={() => setConfirmModal({ isOpen: false, id: null })} />
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-md animate-in fade-in duration-500" onClick={() => setConfirmModal({ isOpen: false, id: null })} />
           <div className="relative w-full max-w-md bg-white rounded-[3rem] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.3)] border border-white/40 p-10 animate-in zoom-in-95 slide-in-from-bottom-10 duration-500 overflow-hidden">
             {/* Visual background element */}
             <div className="absolute -right-20 -top-20 w-48 h-48 bg-amber-100/50 rounded-full blur-[80px]" />
@@ -410,13 +410,13 @@ export const PurchasesView: React.FC = () => {
               <div className="grid grid-cols-2 gap-4 w-full">
                 <button 
                   onClick={() => setConfirmModal({ isOpen: false, id: null })}
-                  className="py-5 bg-[#f5f5f0] text-[#5A5A40] rounded-[1.5rem] text-xs font-black uppercase tracking-widest hover:bg-[#eaeaec] transition-all active:scale-95 shadow-sm"
+                  className="py-5 bg-[#f5f5f0] text-[#5A5A40] rounded-3xl text-xs font-black uppercase tracking-widest hover:bg-[#eaeaec] transition-all active:scale-95 shadow-sm"
                 >
                   Отмена
                 </button>
                 <button 
                   onClick={() => confirmModal.id && approveInvoice(confirmModal.id)}
-                  className="py-5 bg-[#151619] text-white rounded-[1.5rem] text-xs font-black uppercase tracking-widest shadow-xl shadow-[#151619]/20 hover:bg-[#000] transition-all hover:scale-[1.02] active:scale-95"
+                  className="py-5 bg-[#151619] text-white rounded-3xl text-xs font-black uppercase tracking-widest shadow-xl shadow-[#151619]/20 hover:bg-black transition-all hover:scale-[1.02] active:scale-95"
                 >
                   Да, провести
                 </button>

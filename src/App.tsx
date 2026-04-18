@@ -173,12 +173,16 @@ const App: React.FC = () => {
   const handleSaveConfig = async (url: string) => {
     setStatus('Применение настроек...');
     try {
-      const result = await window.pharmaproDesktop?.saveDatabaseConfig(url);
-      if (result?.success) {
-        setStatus('Перезапуск сервера...');
-        // The polling in useEffect will automatically pick up the new server
+      if (window.pharmaproDesktop?.saveDatabaseConfig) {
+        const result = await window.pharmaproDesktop.saveDatabaseConfig(url);
+        if (result?.success) {
+          setStatus('Перезапуск сервера...');
+          // The polling in useEffect will automatically pick up the new server
+        } else {
+          setError(result?.error || 'Не удалось сохранить настройки');
+        }
       } else {
-        setError(result?.error || 'Не удалось сохранить настройки');
+        setError('IPC функция saveDatabaseConfig не определена');
       }
     } catch (err) {
       setError('Ошибка IPC: Не удалось сохранить настройки');
@@ -213,7 +217,7 @@ const App: React.FC = () => {
        setBackingUp(false);
     }
 
-    window.pharmaproDesktop.controls.close();
+    window.pharmaproDesktop?.controls?.close();
   };
 
   return (
@@ -231,7 +235,7 @@ const App: React.FC = () => {
       />
 
       {backingUp && (
-        <div className="fixed inset-0 z-[1000] bg-[#151619] flex flex-col items-center justify-center text-white px-8 text-center animate-in fade-in duration-500">
+        <div className="fixed inset-0 z-1000 bg-[#151619] flex flex-col items-center justify-center text-white px-8 text-center animate-in fade-in duration-500">
           <div className="w-16 h-16 border-4 border-white/10 border-t-white rounded-full animate-spin mb-8" />
           <h2 className="text-2xl font-normal tracking-tight mb-4">Создание резервной копии</h2>
           <p className="text-sm text-white/50 max-w-sm lowercase tracking-wider leading-relaxed italic">

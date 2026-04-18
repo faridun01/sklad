@@ -8,7 +8,9 @@ export interface InvoiceImportItem {
   barcode?: string;
   quantity: number;
   unitsInPack: number;
-  costPrice: number;
+  packPrice: number; // Цена за упаковку
+  unitPrice: number; // Цена за штуку
+  total: number;     // Сумма
   batchNumber: string;
   expiryDate: string;
   confidence?: 'HIGH' | 'MEDIUM' | 'LOW';
@@ -30,7 +32,9 @@ export interface OcrAnalyzeResponse {
     sku?: string;
     barcode?: string;
     quantity: number;
-    costPrice: number;
+    packPrice: number;
+    unitPrice: number;
+    total: number;
     batchNumber?: string;
     expiryDate?: string;
     confidence?: 'HIGH' | 'MEDIUM' | 'LOW';
@@ -44,11 +48,11 @@ export type ImportFileKind = 'image' | 'pdf' | 'excel' | 'unsupported';
 
 export const randomBatch = () => `B-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
 
-export const buildItemIdentity = (item: Pick<InvoiceImportItem, 'name' | 'expiryDate' | 'costPrice'>) => {
+export const buildItemIdentity = (item: Pick<InvoiceImportItem, 'name' | 'expiryDate' | 'packPrice'>) => {
   return [
     item.name.trim().toLowerCase(),
     item.expiryDate || '',
-    Number(item.costPrice || 0).toFixed(2),
+    Number(item.packPrice || 0).toFixed(2),
   ].join('::');
 };
 
@@ -68,7 +72,7 @@ export const isPlaceholderItemName = (value: string) => {
 export const isImportablePreviewItem = (item: Partial<InvoiceImportItem>) => {
   return !isPlaceholderItemName(String(item.name || ''))
     && Number(item.quantity || 0) > 0
-    && Number(item.costPrice || 0) > 0;
+    && Number(item.packPrice || 0) > 0;
 };
 
 export const formatVisibleError = (message: string | null) => {

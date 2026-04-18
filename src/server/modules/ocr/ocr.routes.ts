@@ -606,6 +606,11 @@ ocrRouter.post('/drafts/:id/import', authenticate, asyncHandler(async (req, res)
     productId: string;
     batchNumber: string;
     quantity: number;
+    unitsInPack: number;
+    totalUnits: number;
+    packPrice: number;
+    unitPrice: number;
+    total: number;
     unit: string;
     costBasis: number;
     manufacturedDate: Date;
@@ -701,6 +706,11 @@ ocrRouter.post('/drafts/:id/import', authenticate, asyncHandler(async (req, res)
       productId,
       batchNumber: item.batchNumber,
       quantity: item.quantity,
+      unitsInPack: 1,
+      totalUnits: item.quantity,
+      packPrice: item.costPrice,
+      unitPrice: item.costPrice,
+      total: item.quantity * item.costPrice,
       unit: DEFAULT_BATCH_UNIT,
       costBasis: item.costPrice,
       manufacturedDate: new Date(new Date(importDate).getTime() - 180 * 24 * 60 * 60 * 1000),

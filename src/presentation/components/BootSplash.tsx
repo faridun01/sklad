@@ -200,7 +200,7 @@ export const BootSplash: React.FC<{
 
             {/* Footer */}
             <div className="absolute -bottom-35 left-0 right-0 text-center opacity-30">
-               <span className="text-[8px] font-black text-white uppercase tracking-[0.4em]">PharmaPro Enterprise v2.4</span>
+               <span className="text-[8px] font-black text-white uppercase tracking-[0.4em]">Мой Склад Enterprise v2.4</span>
             </div>
           </div>
         </motion.div>

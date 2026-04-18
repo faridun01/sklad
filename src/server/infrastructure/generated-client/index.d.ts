@@ -35980,18 +35980,18 @@ export namespace Prisma {
 
   export type PurchaseInvoiceItemAvgAggregateOutputType = {
     quantity: number | null
-    purchasePrice: number | null
-    wholesalePrice: number | null
-    retailPrice: number | null
+    packPrice: number | null
+    unitPrice: number | null
+    total: number | null
     lineDiscount: number | null
     lineTotal: number | null
   }
 
   export type PurchaseInvoiceItemSumAggregateOutputType = {
     quantity: number | null
-    purchasePrice: number | null
-    wholesalePrice: number | null
-    retailPrice: number | null
+    packPrice: number | null
+    unitPrice: number | null
+    total: number | null
     lineDiscount: number | null
     lineTotal: number | null
   }
@@ -36002,11 +36002,10 @@ export namespace Prisma {
     productId: string | null
     batchNumber: string | null
     manufacturedDate: Date | null
-    expiryDate: Date | null
     quantity: number | null
-    purchasePrice: number | null
-    wholesalePrice: number | null
-    retailPrice: number | null
+    packPrice: number | null
+    unitPrice: number | null
+    total: number | null
     lineDiscount: number | null
     lineTotal: number | null
   }
@@ -36017,11 +36016,10 @@ export namespace Prisma {
     productId: string | null
     batchNumber: string | null
     manufacturedDate: Date | null
-    expiryDate: Date | null
     quantity: number | null
-    purchasePrice: number | null
-    wholesalePrice: number | null
-    retailPrice: number | null
+    packPrice: number | null
+    unitPrice: number | null
+    total: number | null
     lineDiscount: number | null
     lineTotal: number | null
   }
@@ -36032,11 +36030,10 @@ export namespace Prisma {
     productId: number
     batchNumber: number
     manufacturedDate: number
-    expiryDate: number
     quantity: number
-    purchasePrice: number
-    wholesalePrice: number
-    retailPrice: number
+    packPrice: number
+    unitPrice: number
+    total: number
     lineDiscount: number
     lineTotal: number
     _all: number
@@ -36045,18 +36042,18 @@ export namespace Prisma {
 
   export type PurchaseInvoiceItemAvgAggregateInputType = {
     quantity?: true
-    purchasePrice?: true
-    wholesalePrice?: true
-    retailPrice?: true
+    packPrice?: true
+    unitPrice?: true
+    total?: true
     lineDiscount?: true
     lineTotal?: true
   }
 
   export type PurchaseInvoiceItemSumAggregateInputType = {
     quantity?: true
-    purchasePrice?: true
-    wholesalePrice?: true
-    retailPrice?: true
+    packPrice?: true
+    unitPrice?: true
+    total?: true
     lineDiscount?: true
     lineTotal?: true
   }
@@ -36067,11 +36064,10 @@ export namespace Prisma {
     productId?: true
     batchNumber?: true
     manufacturedDate?: true
-    expiryDate?: true
     quantity?: true
-    purchasePrice?: true
-    wholesalePrice?: true
-    retailPrice?: true
+    packPrice?: true
+    unitPrice?: true
+    total?: true
     lineDiscount?: true
     lineTotal?: true
   }
@@ -36082,11 +36078,10 @@ export namespace Prisma {
     productId?: true
     batchNumber?: true
     manufacturedDate?: true
-    expiryDate?: true
     quantity?: true
-    purchasePrice?: true
-    wholesalePrice?: true
-    retailPrice?: true
+    packPrice?: true
+    unitPrice?: true
+    total?: true
     lineDiscount?: true
     lineTotal?: true
   }
@@ -36097,11 +36092,10 @@ export namespace Prisma {
     productId?: true
     batchNumber?: true
     manufacturedDate?: true
-    expiryDate?: true
     quantity?: true
-    purchasePrice?: true
-    wholesalePrice?: true
-    retailPrice?: true
+    packPrice?: true
+    unitPrice?: true
+    total?: true
     lineDiscount?: true
     lineTotal?: true
     _all?: true
@@ -36199,11 +36193,10 @@ export namespace Prisma {
     productId: string
     batchNumber: string | null
     manufacturedDate: Date | null
-    expiryDate: Date | null
     quantity: number
-    purchasePrice: number
-    wholesalePrice: number | null
-    retailPrice: number | null
+    packPrice: number
+    unitPrice: number
+    total: number
     lineDiscount: number
     lineTotal: number
     _count: PurchaseInvoiceItemCountAggregateOutputType | null
@@ -36233,11 +36226,10 @@ export namespace Prisma {
     productId?: boolean
     batchNumber?: boolean
     manufacturedDate?: boolean
-    expiryDate?: boolean
     quantity?: boolean
-    purchasePrice?: boolean
-    wholesalePrice?: boolean
-    retailPrice?: boolean
+    packPrice?: boolean
+    unitPrice?: boolean
+    total?: boolean
     lineDiscount?: boolean
     lineTotal?: boolean
     purchaseInvoice?: boolean | PurchaseInvoiceDefaultArgs<ExtArgs>
@@ -36252,11 +36244,10 @@ export namespace Prisma {
     productId?: boolean
     batchNumber?: boolean
     manufacturedDate?: boolean
-    expiryDate?: boolean
     quantity?: boolean
-    purchasePrice?: boolean
-    wholesalePrice?: boolean
-    retailPrice?: boolean
+    packPrice?: boolean
+    unitPrice?: boolean
+    total?: boolean
     lineDiscount?: boolean
     lineTotal?: boolean
     purchaseInvoice?: boolean | PurchaseInvoiceDefaultArgs<ExtArgs>
@@ -36269,11 +36260,10 @@ export namespace Prisma {
     productId?: boolean
     batchNumber?: boolean
     manufacturedDate?: boolean
-    expiryDate?: boolean
     quantity?: boolean
-    purchasePrice?: boolean
-    wholesalePrice?: boolean
-    retailPrice?: boolean
+    packPrice?: boolean
+    unitPrice?: boolean
+    total?: boolean
     lineDiscount?: boolean
     lineTotal?: boolean
     purchaseInvoice?: boolean | PurchaseInvoiceDefaultArgs<ExtArgs>
@@ -36286,16 +36276,15 @@ export namespace Prisma {
     productId?: boolean
     batchNumber?: boolean
     manufacturedDate?: boolean
-    expiryDate?: boolean
     quantity?: boolean
-    purchasePrice?: boolean
-    wholesalePrice?: boolean
-    retailPrice?: boolean
+    packPrice?: boolean
+    unitPrice?: boolean
+    total?: boolean
     lineDiscount?: boolean
     lineTotal?: boolean
   }
 
-  export type PurchaseInvoiceItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "purchaseInvoiceId" | "productId" | "batchNumber" | "manufacturedDate" | "expiryDate" | "quantity" | "purchasePrice" | "wholesalePrice" | "retailPrice" | "lineDiscount" | "lineTotal", ExtArgs["result"]["purchaseInvoiceItem"]>
+  export type PurchaseInvoiceItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "purchaseInvoiceId" | "productId" | "batchNumber" | "manufacturedDate" | "quantity" | "packPrice" | "unitPrice" | "total" | "lineDiscount" | "lineTotal", ExtArgs["result"]["purchaseInvoiceItem"]>
   export type PurchaseInvoiceItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     purchaseInvoice?: boolean | PurchaseInvoiceDefaultArgs<ExtArgs>
     product?: boolean | ProductDefaultArgs<ExtArgs>
@@ -36324,11 +36313,10 @@ export namespace Prisma {
       productId: string
       batchNumber: string | null
       manufacturedDate: Date | null
-      expiryDate: Date | null
       quantity: number
-      purchasePrice: number
-      wholesalePrice: number | null
-      retailPrice: number | null
+      packPrice: number
+      unitPrice: number
+      total: number
       lineDiscount: number
       lineTotal: number
     }, ExtArgs["result"]["purchaseInvoiceItem"]>
@@ -36762,11 +36750,10 @@ export namespace Prisma {
     readonly productId: FieldRef<"PurchaseInvoiceItem", 'String'>
     readonly batchNumber: FieldRef<"PurchaseInvoiceItem", 'String'>
     readonly manufacturedDate: FieldRef<"PurchaseInvoiceItem", 'DateTime'>
-    readonly expiryDate: FieldRef<"PurchaseInvoiceItem", 'DateTime'>
     readonly quantity: FieldRef<"PurchaseInvoiceItem", 'Int'>
-    readonly purchasePrice: FieldRef<"PurchaseInvoiceItem", 'Float'>
-    readonly wholesalePrice: FieldRef<"PurchaseInvoiceItem", 'Float'>
-    readonly retailPrice: FieldRef<"PurchaseInvoiceItem", 'Float'>
+    readonly packPrice: FieldRef<"PurchaseInvoiceItem", 'Float'>
+    readonly unitPrice: FieldRef<"PurchaseInvoiceItem", 'Float'>
+    readonly total: FieldRef<"PurchaseInvoiceItem", 'Float'>
     readonly lineDiscount: FieldRef<"PurchaseInvoiceItem", 'Float'>
     readonly lineTotal: FieldRef<"PurchaseInvoiceItem", 'Float'>
   }
@@ -53087,11 +53074,10 @@ export namespace Prisma {
     productId: 'productId',
     batchNumber: 'batchNumber',
     manufacturedDate: 'manufacturedDate',
-    expiryDate: 'expiryDate',
     quantity: 'quantity',
-    purchasePrice: 'purchasePrice',
-    wholesalePrice: 'wholesalePrice',
-    retailPrice: 'retailPrice',
+    packPrice: 'packPrice',
+    unitPrice: 'unitPrice',
+    total: 'total',
     lineDiscount: 'lineDiscount',
     lineTotal: 'lineTotal'
   };
@@ -56012,11 +55998,10 @@ export namespace Prisma {
     productId?: StringFilter<"PurchaseInvoiceItem"> | string
     batchNumber?: StringNullableFilter<"PurchaseInvoiceItem"> | string | null
     manufacturedDate?: DateTimeNullableFilter<"PurchaseInvoiceItem"> | Date | string | null
-    expiryDate?: DateTimeNullableFilter<"PurchaseInvoiceItem"> | Date | string | null
     quantity?: IntFilter<"PurchaseInvoiceItem"> | number
-    purchasePrice?: FloatFilter<"PurchaseInvoiceItem"> | number
-    wholesalePrice?: FloatNullableFilter<"PurchaseInvoiceItem"> | number | null
-    retailPrice?: FloatNullableFilter<"PurchaseInvoiceItem"> | number | null
+    packPrice?: FloatFilter<"PurchaseInvoiceItem"> | number
+    unitPrice?: FloatFilter<"PurchaseInvoiceItem"> | number
+    total?: FloatFilter<"PurchaseInvoiceItem"> | number
     lineDiscount?: FloatFilter<"PurchaseInvoiceItem"> | number
     lineTotal?: FloatFilter<"PurchaseInvoiceItem"> | number
     purchaseInvoice?: XOR<PurchaseInvoiceScalarRelationFilter, PurchaseInvoiceWhereInput>
@@ -56030,11 +56015,10 @@ export namespace Prisma {
     productId?: SortOrder
     batchNumber?: SortOrderInput | SortOrder
     manufacturedDate?: SortOrderInput | SortOrder
-    expiryDate?: SortOrderInput | SortOrder
     quantity?: SortOrder
-    purchasePrice?: SortOrder
-    wholesalePrice?: SortOrderInput | SortOrder
-    retailPrice?: SortOrderInput | SortOrder
+    packPrice?: SortOrder
+    unitPrice?: SortOrder
+    total?: SortOrder
     lineDiscount?: SortOrder
     lineTotal?: SortOrder
     purchaseInvoice?: PurchaseInvoiceOrderByWithRelationInput
@@ -56051,11 +56035,10 @@ export namespace Prisma {
     productId?: StringFilter<"PurchaseInvoiceItem"> | string
     batchNumber?: StringNullableFilter<"PurchaseInvoiceItem"> | string | null
     manufacturedDate?: DateTimeNullableFilter<"PurchaseInvoiceItem"> | Date | string | null
-    expiryDate?: DateTimeNullableFilter<"PurchaseInvoiceItem"> | Date | string | null
     quantity?: IntFilter<"PurchaseInvoiceItem"> | number
-    purchasePrice?: FloatFilter<"PurchaseInvoiceItem"> | number
-    wholesalePrice?: FloatNullableFilter<"PurchaseInvoiceItem"> | number | null
-    retailPrice?: FloatNullableFilter<"PurchaseInvoiceItem"> | number | null
+    packPrice?: FloatFilter<"PurchaseInvoiceItem"> | number
+    unitPrice?: FloatFilter<"PurchaseInvoiceItem"> | number
+    total?: FloatFilter<"PurchaseInvoiceItem"> | number
     lineDiscount?: FloatFilter<"PurchaseInvoiceItem"> | number
     lineTotal?: FloatFilter<"PurchaseInvoiceItem"> | number
     purchaseInvoice?: XOR<PurchaseInvoiceScalarRelationFilter, PurchaseInvoiceWhereInput>
@@ -56069,11 +56052,10 @@ export namespace Prisma {
     productId?: SortOrder
     batchNumber?: SortOrderInput | SortOrder
     manufacturedDate?: SortOrderInput | SortOrder
-    expiryDate?: SortOrderInput | SortOrder
     quantity?: SortOrder
-    purchasePrice?: SortOrder
-    wholesalePrice?: SortOrderInput | SortOrder
-    retailPrice?: SortOrderInput | SortOrder
+    packPrice?: SortOrder
+    unitPrice?: SortOrder
+    total?: SortOrder
     lineDiscount?: SortOrder
     lineTotal?: SortOrder
     _count?: PurchaseInvoiceItemCountOrderByAggregateInput
@@ -56092,11 +56074,10 @@ export namespace Prisma {
     productId?: StringWithAggregatesFilter<"PurchaseInvoiceItem"> | string
     batchNumber?: StringNullableWithAggregatesFilter<"PurchaseInvoiceItem"> | string | null
     manufacturedDate?: DateTimeNullableWithAggregatesFilter<"PurchaseInvoiceItem"> | Date | string | null
-    expiryDate?: DateTimeNullableWithAggregatesFilter<"PurchaseInvoiceItem"> | Date | string | null
     quantity?: IntWithAggregatesFilter<"PurchaseInvoiceItem"> | number
-    purchasePrice?: FloatWithAggregatesFilter<"PurchaseInvoiceItem"> | number
-    wholesalePrice?: FloatNullableWithAggregatesFilter<"PurchaseInvoiceItem"> | number | null
-    retailPrice?: FloatNullableWithAggregatesFilter<"PurchaseInvoiceItem"> | number | null
+    packPrice?: FloatWithAggregatesFilter<"PurchaseInvoiceItem"> | number
+    unitPrice?: FloatWithAggregatesFilter<"PurchaseInvoiceItem"> | number
+    total?: FloatWithAggregatesFilter<"PurchaseInvoiceItem"> | number
     lineDiscount?: FloatWithAggregatesFilter<"PurchaseInvoiceItem"> | number
     lineTotal?: FloatWithAggregatesFilter<"PurchaseInvoiceItem"> | number
   }
@@ -59690,11 +59671,10 @@ export namespace Prisma {
     id?: string
     batchNumber?: string | null
     manufacturedDate?: Date | string | null
-    expiryDate?: Date | string | null
     quantity: number
-    purchasePrice: number
-    wholesalePrice?: number | null
-    retailPrice?: number | null
+    packPrice?: number
+    unitPrice?: number
+    total?: number
     lineDiscount?: number
     lineTotal?: number
     purchaseInvoice: PurchaseInvoiceCreateNestedOneWithoutItemsInput
@@ -59708,11 +59688,10 @@ export namespace Prisma {
     productId: string
     batchNumber?: string | null
     manufacturedDate?: Date | string | null
-    expiryDate?: Date | string | null
     quantity: number
-    purchasePrice: number
-    wholesalePrice?: number | null
-    retailPrice?: number | null
+    packPrice?: number
+    unitPrice?: number
+    total?: number
     lineDiscount?: number
     lineTotal?: number
     batches?: BatchUncheckedCreateNestedManyWithoutPurchaseItemInput
@@ -59722,11 +59701,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
     manufacturedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quantity?: IntFieldUpdateOperationsInput | number
-    purchasePrice?: FloatFieldUpdateOperationsInput | number
-    wholesalePrice?: NullableFloatFieldUpdateOperationsInput | number | null
-    retailPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    packPrice?: FloatFieldUpdateOperationsInput | number
+    unitPrice?: FloatFieldUpdateOperationsInput | number
+    total?: FloatFieldUpdateOperationsInput | number
     lineDiscount?: FloatFieldUpdateOperationsInput | number
     lineTotal?: FloatFieldUpdateOperationsInput | number
     purchaseInvoice?: PurchaseInvoiceUpdateOneRequiredWithoutItemsNestedInput
@@ -59740,11 +59718,10 @@ export namespace Prisma {
     productId?: StringFieldUpdateOperationsInput | string
     batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
     manufacturedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quantity?: IntFieldUpdateOperationsInput | number
-    purchasePrice?: FloatFieldUpdateOperationsInput | number
-    wholesalePrice?: NullableFloatFieldUpdateOperationsInput | number | null
-    retailPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    packPrice?: FloatFieldUpdateOperationsInput | number
+    unitPrice?: FloatFieldUpdateOperationsInput | number
+    total?: FloatFieldUpdateOperationsInput | number
     lineDiscount?: FloatFieldUpdateOperationsInput | number
     lineTotal?: FloatFieldUpdateOperationsInput | number
     batches?: BatchUncheckedUpdateManyWithoutPurchaseItemNestedInput
@@ -59756,11 +59733,10 @@ export namespace Prisma {
     productId: string
     batchNumber?: string | null
     manufacturedDate?: Date | string | null
-    expiryDate?: Date | string | null
     quantity: number
-    purchasePrice: number
-    wholesalePrice?: number | null
-    retailPrice?: number | null
+    packPrice?: number
+    unitPrice?: number
+    total?: number
     lineDiscount?: number
     lineTotal?: number
   }
@@ -59769,11 +59745,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
     manufacturedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quantity?: IntFieldUpdateOperationsInput | number
-    purchasePrice?: FloatFieldUpdateOperationsInput | number
-    wholesalePrice?: NullableFloatFieldUpdateOperationsInput | number | null
-    retailPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    packPrice?: FloatFieldUpdateOperationsInput | number
+    unitPrice?: FloatFieldUpdateOperationsInput | number
+    total?: FloatFieldUpdateOperationsInput | number
     lineDiscount?: FloatFieldUpdateOperationsInput | number
     lineTotal?: FloatFieldUpdateOperationsInput | number
   }
@@ -59784,11 +59759,10 @@ export namespace Prisma {
     productId?: StringFieldUpdateOperationsInput | string
     batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
     manufacturedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quantity?: IntFieldUpdateOperationsInput | number
-    purchasePrice?: FloatFieldUpdateOperationsInput | number
-    wholesalePrice?: NullableFloatFieldUpdateOperationsInput | number | null
-    retailPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    packPrice?: FloatFieldUpdateOperationsInput | number
+    unitPrice?: FloatFieldUpdateOperationsInput | number
+    total?: FloatFieldUpdateOperationsInput | number
     lineDiscount?: FloatFieldUpdateOperationsInput | number
     lineTotal?: FloatFieldUpdateOperationsInput | number
   }
@@ -63082,20 +63056,19 @@ export namespace Prisma {
     productId?: SortOrder
     batchNumber?: SortOrder
     manufacturedDate?: SortOrder
-    expiryDate?: SortOrder
     quantity?: SortOrder
-    purchasePrice?: SortOrder
-    wholesalePrice?: SortOrder
-    retailPrice?: SortOrder
+    packPrice?: SortOrder
+    unitPrice?: SortOrder
+    total?: SortOrder
     lineDiscount?: SortOrder
     lineTotal?: SortOrder
   }
 
   export type PurchaseInvoiceItemAvgOrderByAggregateInput = {
     quantity?: SortOrder
-    purchasePrice?: SortOrder
-    wholesalePrice?: SortOrder
-    retailPrice?: SortOrder
+    packPrice?: SortOrder
+    unitPrice?: SortOrder
+    total?: SortOrder
     lineDiscount?: SortOrder
     lineTotal?: SortOrder
   }
@@ -63106,11 +63079,10 @@ export namespace Prisma {
     productId?: SortOrder
     batchNumber?: SortOrder
     manufacturedDate?: SortOrder
-    expiryDate?: SortOrder
     quantity?: SortOrder
-    purchasePrice?: SortOrder
-    wholesalePrice?: SortOrder
-    retailPrice?: SortOrder
+    packPrice?: SortOrder
+    unitPrice?: SortOrder
+    total?: SortOrder
     lineDiscount?: SortOrder
     lineTotal?: SortOrder
   }
@@ -63121,20 +63093,19 @@ export namespace Prisma {
     productId?: SortOrder
     batchNumber?: SortOrder
     manufacturedDate?: SortOrder
-    expiryDate?: SortOrder
     quantity?: SortOrder
-    purchasePrice?: SortOrder
-    wholesalePrice?: SortOrder
-    retailPrice?: SortOrder
+    packPrice?: SortOrder
+    unitPrice?: SortOrder
+    total?: SortOrder
     lineDiscount?: SortOrder
     lineTotal?: SortOrder
   }
 
   export type PurchaseInvoiceItemSumOrderByAggregateInput = {
     quantity?: SortOrder
-    purchasePrice?: SortOrder
-    wholesalePrice?: SortOrder
-    retailPrice?: SortOrder
+    packPrice?: SortOrder
+    unitPrice?: SortOrder
+    total?: SortOrder
     lineDiscount?: SortOrder
     lineTotal?: SortOrder
   }
@@ -69435,11 +69406,10 @@ export namespace Prisma {
     id?: string
     batchNumber?: string | null
     manufacturedDate?: Date | string | null
-    expiryDate?: Date | string | null
     quantity: number
-    purchasePrice: number
-    wholesalePrice?: number | null
-    retailPrice?: number | null
+    packPrice?: number
+    unitPrice?: number
+    total?: number
     lineDiscount?: number
     lineTotal?: number
     purchaseInvoice: PurchaseInvoiceCreateNestedOneWithoutItemsInput
@@ -69451,11 +69421,10 @@ export namespace Prisma {
     purchaseInvoiceId: string
     batchNumber?: string | null
     manufacturedDate?: Date | string | null
-    expiryDate?: Date | string | null
     quantity: number
-    purchasePrice: number
-    wholesalePrice?: number | null
-    retailPrice?: number | null
+    packPrice?: number
+    unitPrice?: number
+    total?: number
     lineDiscount?: number
     lineTotal?: number
     batches?: BatchUncheckedCreateNestedManyWithoutPurchaseItemInput
@@ -69940,11 +69909,10 @@ export namespace Prisma {
     productId?: StringFilter<"PurchaseInvoiceItem"> | string
     batchNumber?: StringNullableFilter<"PurchaseInvoiceItem"> | string | null
     manufacturedDate?: DateTimeNullableFilter<"PurchaseInvoiceItem"> | Date | string | null
-    expiryDate?: DateTimeNullableFilter<"PurchaseInvoiceItem"> | Date | string | null
     quantity?: IntFilter<"PurchaseInvoiceItem"> | number
-    purchasePrice?: FloatFilter<"PurchaseInvoiceItem"> | number
-    wholesalePrice?: FloatNullableFilter<"PurchaseInvoiceItem"> | number | null
-    retailPrice?: FloatNullableFilter<"PurchaseInvoiceItem"> | number | null
+    packPrice?: FloatFilter<"PurchaseInvoiceItem"> | number
+    unitPrice?: FloatFilter<"PurchaseInvoiceItem"> | number
+    total?: FloatFilter<"PurchaseInvoiceItem"> | number
     lineDiscount?: FloatFilter<"PurchaseInvoiceItem"> | number
     lineTotal?: FloatFilter<"PurchaseInvoiceItem"> | number
   }
@@ -70261,11 +70229,10 @@ export namespace Prisma {
     id?: string
     batchNumber?: string | null
     manufacturedDate?: Date | string | null
-    expiryDate?: Date | string | null
     quantity: number
-    purchasePrice: number
-    wholesalePrice?: number | null
-    retailPrice?: number | null
+    packPrice?: number
+    unitPrice?: number
+    total?: number
     lineDiscount?: number
     lineTotal?: number
     purchaseInvoice: PurchaseInvoiceCreateNestedOneWithoutItemsInput
@@ -70278,11 +70245,10 @@ export namespace Prisma {
     productId: string
     batchNumber?: string | null
     manufacturedDate?: Date | string | null
-    expiryDate?: Date | string | null
     quantity: number
-    purchasePrice: number
-    wholesalePrice?: number | null
-    retailPrice?: number | null
+    packPrice?: number
+    unitPrice?: number
+    total?: number
     lineDiscount?: number
     lineTotal?: number
   }
@@ -70682,11 +70648,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
     manufacturedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quantity?: IntFieldUpdateOperationsInput | number
-    purchasePrice?: FloatFieldUpdateOperationsInput | number
-    wholesalePrice?: NullableFloatFieldUpdateOperationsInput | number | null
-    retailPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    packPrice?: FloatFieldUpdateOperationsInput | number
+    unitPrice?: FloatFieldUpdateOperationsInput | number
+    total?: FloatFieldUpdateOperationsInput | number
     lineDiscount?: FloatFieldUpdateOperationsInput | number
     lineTotal?: FloatFieldUpdateOperationsInput | number
     purchaseInvoice?: PurchaseInvoiceUpdateOneRequiredWithoutItemsNestedInput
@@ -70699,11 +70664,10 @@ export namespace Prisma {
     productId?: StringFieldUpdateOperationsInput | string
     batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
     manufacturedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quantity?: IntFieldUpdateOperationsInput | number
-    purchasePrice?: FloatFieldUpdateOperationsInput | number
-    wholesalePrice?: NullableFloatFieldUpdateOperationsInput | number | null
-    retailPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    packPrice?: FloatFieldUpdateOperationsInput | number
+    unitPrice?: FloatFieldUpdateOperationsInput | number
+    total?: FloatFieldUpdateOperationsInput | number
     lineDiscount?: FloatFieldUpdateOperationsInput | number
     lineTotal?: FloatFieldUpdateOperationsInput | number
   }
@@ -79416,11 +79380,10 @@ export namespace Prisma {
     id?: string
     batchNumber?: string | null
     manufacturedDate?: Date | string | null
-    expiryDate?: Date | string | null
     quantity: number
-    purchasePrice: number
-    wholesalePrice?: number | null
-    retailPrice?: number | null
+    packPrice?: number
+    unitPrice?: number
+    total?: number
     lineDiscount?: number
     lineTotal?: number
     product: ProductCreateNestedOneWithoutPurchaseItemsInput
@@ -79432,11 +79395,10 @@ export namespace Prisma {
     productId: string
     batchNumber?: string | null
     manufacturedDate?: Date | string | null
-    expiryDate?: Date | string | null
     quantity: number
-    purchasePrice: number
-    wholesalePrice?: number | null
-    retailPrice?: number | null
+    packPrice?: number
+    unitPrice?: number
+    total?: number
     lineDiscount?: number
     lineTotal?: number
     batches?: BatchUncheckedCreateNestedManyWithoutPurchaseItemInput
@@ -83631,11 +83593,10 @@ export namespace Prisma {
     purchaseInvoiceId: string
     batchNumber?: string | null
     manufacturedDate?: Date | string | null
-    expiryDate?: Date | string | null
     quantity: number
-    purchasePrice: number
-    wholesalePrice?: number | null
-    retailPrice?: number | null
+    packPrice?: number
+    unitPrice?: number
+    total?: number
     lineDiscount?: number
     lineTotal?: number
   }
@@ -83919,11 +83880,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
     manufacturedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quantity?: IntFieldUpdateOperationsInput | number
-    purchasePrice?: FloatFieldUpdateOperationsInput | number
-    wholesalePrice?: NullableFloatFieldUpdateOperationsInput | number | null
-    retailPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    packPrice?: FloatFieldUpdateOperationsInput | number
+    unitPrice?: FloatFieldUpdateOperationsInput | number
+    total?: FloatFieldUpdateOperationsInput | number
     lineDiscount?: FloatFieldUpdateOperationsInput | number
     lineTotal?: FloatFieldUpdateOperationsInput | number
     purchaseInvoice?: PurchaseInvoiceUpdateOneRequiredWithoutItemsNestedInput
@@ -83935,11 +83895,10 @@ export namespace Prisma {
     purchaseInvoiceId?: StringFieldUpdateOperationsInput | string
     batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
     manufacturedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quantity?: IntFieldUpdateOperationsInput | number
-    purchasePrice?: FloatFieldUpdateOperationsInput | number
-    wholesalePrice?: NullableFloatFieldUpdateOperationsInput | number | null
-    retailPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    packPrice?: FloatFieldUpdateOperationsInput | number
+    unitPrice?: FloatFieldUpdateOperationsInput | number
+    total?: FloatFieldUpdateOperationsInput | number
     lineDiscount?: FloatFieldUpdateOperationsInput | number
     lineTotal?: FloatFieldUpdateOperationsInput | number
     batches?: BatchUncheckedUpdateManyWithoutPurchaseItemNestedInput
@@ -83950,11 +83909,10 @@ export namespace Prisma {
     purchaseInvoiceId?: StringFieldUpdateOperationsInput | string
     batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
     manufacturedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quantity?: IntFieldUpdateOperationsInput | number
-    purchasePrice?: FloatFieldUpdateOperationsInput | number
-    wholesalePrice?: NullableFloatFieldUpdateOperationsInput | number | null
-    retailPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    packPrice?: FloatFieldUpdateOperationsInput | number
+    unitPrice?: FloatFieldUpdateOperationsInput | number
+    total?: FloatFieldUpdateOperationsInput | number
     lineDiscount?: FloatFieldUpdateOperationsInput | number
     lineTotal?: FloatFieldUpdateOperationsInput | number
   }
@@ -87443,11 +87401,10 @@ export namespace Prisma {
     productId: string
     batchNumber?: string | null
     manufacturedDate?: Date | string | null
-    expiryDate?: Date | string | null
     quantity: number
-    purchasePrice: number
-    wholesalePrice?: number | null
-    retailPrice?: number | null
+    packPrice?: number
+    unitPrice?: number
+    total?: number
     lineDiscount?: number
     lineTotal?: number
   }
@@ -87485,11 +87442,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
     manufacturedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quantity?: IntFieldUpdateOperationsInput | number
-    purchasePrice?: FloatFieldUpdateOperationsInput | number
-    wholesalePrice?: NullableFloatFieldUpdateOperationsInput | number | null
-    retailPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    packPrice?: FloatFieldUpdateOperationsInput | number
+    unitPrice?: FloatFieldUpdateOperationsInput | number
+    total?: FloatFieldUpdateOperationsInput | number
     lineDiscount?: FloatFieldUpdateOperationsInput | number
     lineTotal?: FloatFieldUpdateOperationsInput | number
     product?: ProductUpdateOneRequiredWithoutPurchaseItemsNestedInput
@@ -87501,11 +87457,10 @@ export namespace Prisma {
     productId?: StringFieldUpdateOperationsInput | string
     batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
     manufacturedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quantity?: IntFieldUpdateOperationsInput | number
-    purchasePrice?: FloatFieldUpdateOperationsInput | number
-    wholesalePrice?: NullableFloatFieldUpdateOperationsInput | number | null
-    retailPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    packPrice?: FloatFieldUpdateOperationsInput | number
+    unitPrice?: FloatFieldUpdateOperationsInput | number
+    total?: FloatFieldUpdateOperationsInput | number
     lineDiscount?: FloatFieldUpdateOperationsInput | number
     lineTotal?: FloatFieldUpdateOperationsInput | number
     batches?: BatchUncheckedUpdateManyWithoutPurchaseItemNestedInput
@@ -87516,11 +87471,10 @@ export namespace Prisma {
     productId?: StringFieldUpdateOperationsInput | string
     batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
     manufacturedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quantity?: IntFieldUpdateOperationsInput | number
-    purchasePrice?: FloatFieldUpdateOperationsInput | number
-    wholesalePrice?: NullableFloatFieldUpdateOperationsInput | number | null
-    retailPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    packPrice?: FloatFieldUpdateOperationsInput | number
+    unitPrice?: FloatFieldUpdateOperationsInput | number
+    total?: FloatFieldUpdateOperationsInput | number
     lineDiscount?: FloatFieldUpdateOperationsInput | number
     lineTotal?: FloatFieldUpdateOperationsInput | number
   }

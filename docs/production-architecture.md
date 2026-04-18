@@ -1,8 +1,8 @@
-# PharmaPro Desktop + PostgreSQL Architecture
+# PharmaPro на Мой Склад Desktop + PostgreSQL Architecture
 
 ## 1) Target runtime model
 
-PharmaPro should run as a desktop-first system with three explicit runtime layers:
+PharmaPro на Мой Склад should run as a desktop-first system with three explicit runtime layers:
 
 1. Electron shell
 2. Local backend process

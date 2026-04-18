@@ -48,8 +48,8 @@ const storagePath = path.join(storageDir, 'report-settings.json');
 
 const defaultState: ReportSettingsState = {
   companyProfile: {
-    pharmacyName: 'Аптека PharmaPro',
-    legalName: 'ООО PharmaPro',
+    pharmacyName: 'Аптека PharmaPro на Мой Склад',
+    legalName: 'ООО PharmaPro на Мой Склад',
     address: 'Dushanbe',
     taxId: '000000000',
     phone: '',

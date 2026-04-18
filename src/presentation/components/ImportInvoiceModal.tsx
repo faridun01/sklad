@@ -26,8 +26,9 @@ import {
 
 export const ImportInvoiceModal: React.FC<ImportInvoiceModalProps> = ({ isOpen, onClose }) => {
   const { t } = useTranslation();
-  const { suppliers, products, importPurchaseInvoice, refreshProducts, refreshSuppliers, createProduct } = usePharmacy();
+  // ...existing code...
 
+  const { suppliers, products, importPurchaseInvoice, refreshProducts, refreshSuppliers, createProduct } = usePharmacy();
   const [supplierId, setSupplierId] = useState('');
   const [invoiceNumber, setInvoiceNumber] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -75,6 +76,8 @@ export const ImportInvoiceModal: React.FC<ImportInvoiceModalProps> = ({ isOpen, 
   const addItem = (product: any) => {
     const existing = items.find((i) => i.productId === product.id);
     if (existing) return;
+    const packPrice = product.packPrice || product.costPrice || 0;
+    const unitPrice = product.unitPrice || (packPrice / (product.unitsInPack || 1));
     setItems([
       ...items,
       {
@@ -85,7 +88,9 @@ export const ImportInvoiceModal: React.FC<ImportInvoiceModalProps> = ({ isOpen, 
         barcode: product.barcode,
         quantity: 1,
         unitsInPack: 1,
-        costPrice: product.costPrice,
+        packPrice,
+        unitPrice,
+        total: unitPrice * 1,
         batchNumber: `B-${Math.random().toString(36).substr(2, 6).toUpperCase()}`,
         expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       },
@@ -104,7 +109,9 @@ export const ImportInvoiceModal: React.FC<ImportInvoiceModalProps> = ({ isOpen, 
         barcode: '',
         quantity: 1,
         unitsInPack: 1,
-        costPrice: 0,
+        packPrice: 0,
+        unitPrice: 0,
+        total: 0,
         batchNumber: randomBatch(),
         expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       },
@@ -116,10 +123,27 @@ export const ImportInvoiceModal: React.FC<ImportInvoiceModalProps> = ({ isOpen, 
   };
 
   const updateItem = (lineId: string, field: keyof InvoiceImportItem, value: any) => {
-    setItems(items.map((i) => (i.lineId === lineId ? { ...i, [field]: value } : i)));
+    setItems(items.map((i) => {
+      if (i.lineId !== lineId) return i;
+      let updated = { ...i, [field]: value };
+      // Автоматически пересчитывать total, unitPrice, packPrice
+      if (field === 'packPrice') {
+        updated.unitPrice = updated.unitsInPack > 0 ? value / updated.unitsInPack : 0;
+        updated.total = updated.quantity * value;
+      } else if (field === 'unitPrice') {
+        updated.packPrice = updated.unitsInPack > 0 ? value * updated.unitsInPack : 0;
+        updated.total = updated.quantity * updated.packPrice;
+      } else if (field === 'quantity' || field === 'unitsInPack') {
+        updated.packPrice = updated.unitPrice * updated.unitsInPack;
+        updated.total = updated.quantity * updated.packPrice;
+      } else if (field === 'total') {
+        // total редактируется вручную — не трогаем цены
+      }
+      return updated;
+    }));
   };
 
-  const grossTotal = items.reduce((acc, i) => acc + i.quantity * i.unitsInPack * i.costPrice, 0);
+  const grossTotal = items.reduce((acc, i) => acc + i.total, 0);
   const netTotal = Math.max(0, grossTotal - discountAmount);
   const visibleError = formatVisibleError(error);
 
@@ -137,21 +161,31 @@ export const ImportInvoiceModal: React.FC<ImportInvoiceModalProps> = ({ isOpen, 
     }
 
     return (data.items || [])
-      .map((item: any, index: number) => ({
-        lineId: item.lineId || `parsed-${Date.now()}-${index}`,
-        productId: item.productId || null,
-        name: item.name,
-        sku: item.sku || '',
-        barcode: item.barcode || '',
-        quantity: Number(item.quantity) || 0,
-        unitsInPack: 1,
-        costPrice: Number(item.costPrice) || 0,
-        batchNumber: item.batchNumber || `B-${Math.random().toString(36).substr(2, 6).toUpperCase()}`,
-        expiryDate: item.expiryDate || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        confidence: item.confidence,
-        warnings: item.warnings || '',
-        needsReview: !!item.needsReview,
-      }))
+      .map((item: any, index: number) => {
+        const quantity = Number(item.quantity) || 0;
+        const unitsInPack = Math.max(1, Number(item.unitsInPack) || 1);
+        const packPrice = Number(item.packPrice ?? item.boxPrice ?? item.costPrice) || 0;
+        const unitPrice = Number(item.unitPrice) || (unitsInPack > 0 ? packPrice / unitsInPack : 0);
+        const total = Number(item.total) || (quantity * packPrice);
+
+        return {
+          lineId: item.lineId || `parsed-${Date.now()}-${index}`,
+          productId: item.productId || null,
+          name: item.name,
+          sku: item.sku || '',
+          barcode: item.barcode || '',
+          quantity,
+          unitsInPack,
+          packPrice,
+          unitPrice,
+          total,
+          batchNumber: item.batchNumber || `B-${Math.random().toString(36).substr(2, 6).toUpperCase()}`,
+          expiryDate: item.expiryDate || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          confidence: item.confidence,
+          warnings: item.warnings || '',
+          needsReview: !!item.needsReview,
+        };
+      })
       .filter((item) => isImportablePreviewItem(item)) as InvoiceImportItem[];
   };
 
@@ -298,6 +332,7 @@ export const ImportInvoiceModal: React.FC<ImportInvoiceModalProps> = ({ isOpen, 
             createMissingProducts: true,
             items: items.map((item) => ({
               ...item,
+              costPrice: item.unitPrice,
               quantity: item.quantity * item.unitsInPack,
             })),
           }),
@@ -349,8 +384,8 @@ export const ImportInvoiceModal: React.FC<ImportInvoiceModalProps> = ({ isOpen, 
             category: 'Imported',
             manufacturer: selectedSupplier?.name || 'Invoice Import',
             minStock: 10,
-            costPrice: item.costPrice || 0,
-            sellingPrice: Number((item.costPrice * 1.35).toFixed(2)),
+            costPrice: item.unitPrice || 0,
+            sellingPrice: Number((item.unitPrice * 1.35).toFixed(2)),
             image: '',
             prescription: false,
             markingRequired: false,
@@ -368,9 +403,14 @@ export const ImportInvoiceModal: React.FC<ImportInvoiceModalProps> = ({ isOpen, 
         importItems.push({
           productId,
           batchNumber: item.batchNumber?.trim() || randomBatch(),
-          quantity: item.quantity * item.unitsInPack,
+          quantity: item.quantity,
+          unitsInPack: item.unitsInPack,
+          totalUnits: item.quantity * item.unitsInPack,
+          packPrice: item.packPrice,
+          unitPrice: item.unitPrice,
+          total: item.total,
           unit: 'units',
-          costBasis: item.costPrice,
+          costBasis: item.unitPrice,
           manufacturedDate: new Date(date),
           expiryDate: new Date(item.expiryDate),
         });
@@ -413,6 +453,7 @@ export const ImportInvoiceModal: React.FC<ImportInvoiceModalProps> = ({ isOpen, 
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 12 }}
             className="relative w-full max-w-5xl bg-white rounded-[2.5rem] shadow-2xl border border-[#5A5A40]/10 overflow-hidden flex flex-col max-h-[90vh]"
+            onClick={e => e.stopPropagation()}
           >
             <div className="p-8 border-b border-[#5A5A40]/5 flex items-center justify-between bg-[#f5f5f0]/30">
               <div className="flex items-center gap-4">
@@ -476,7 +517,7 @@ export const ImportInvoiceModal: React.FC<ImportInvoiceModalProps> = ({ isOpen, 
                               <td className="px-3 py-2 font-semibold text-[#5A5A40]">{row.name}</td>
                               <td className="px-3 py-2">{row.expiryDate}</td>
                               <td className="px-3 py-2">{row.unitsInPack > 1 ? `${row.quantity} x ${row.unitsInPack}` : row.quantity}</td>
-                              <td className="px-3 py-2">{row.costPrice}</td>
+                              <td className="px-3 py-2">{row.packPrice}</td>
                               <td className="px-3 py-2">
                                 {row.needsReview ? (
                                   <span className="text-amber-700 bg-amber-100 px-2 py-0.5 rounded">Нужна проверка</span>
@@ -519,30 +560,42 @@ export const ImportInvoiceModal: React.FC<ImportInvoiceModalProps> = ({ isOpen, 
                         <thead>
                           <tr className="bg-[#f5f5f0] text-[#5A5A40]/70 uppercase tracking-wider text-[10px]">
                             <th className="px-3 py-2">Наименование</th>
-                            <th className="px-3 py-2">Срок</th>
-                            <th className="px-3 py-2">Кол-во</th>
-                            <th className="px-3 py-2">Цена</th>
+                            <th className="px-3 py-2">Коробок</th>
+                            <th className="px-3 py-2">Штук</th>
+                            <th className="px-3 py-2">Цена/коробка</th>
+                            <th className="px-3 py-2">Цена/штука</th>
+                            <th className="px-3 py-2">Сумма</th>
                             <th className="px-3 py-2">Предупреждения</th>
                             <th className="px-3 py-2">Статус</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {pendingOcrItems.map((row) => (
-                            <tr key={row.lineId} className="border-t border-[#5A5A40]/10 align-top">
-                              <td className="px-3 py-2 font-semibold text-[#5A5A40]">{row.name}</td>
-                              <td className="px-3 py-2 whitespace-nowrap">{row.expiryDate}</td>
-                              <td className="px-3 py-2 whitespace-nowrap">{row.unitsInPack > 1 ? `${row.quantity} x ${row.unitsInPack}` : row.quantity}</td>
-                              <td className="px-3 py-2 whitespace-nowrap">{row.costPrice}</td>
-                              <td className="px-3 py-2 text-[11px] text-amber-800">{row.warnings || 'Без предупреждений'}</td>
-                              <td className="px-3 py-2 whitespace-nowrap">
-                                {row.needsReview ? (
-                                  <span className="text-amber-700 bg-amber-100 px-2 py-0.5 rounded">Нужна проверка</span>
-                                ) : (
-                                  <span className="text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">OK</span>
-                                )}
-                              </td>
-                            </tr>
-                          ))}
+                          {pendingOcrItems.map((row) => {
+                            const boxCount = Number(row.quantity) || 0;
+                            const unitsInBox = Number(row.unitsInPack) || 1;
+                            const totalUnits = boxCount * unitsInBox;
+                            const packPrice = Number(row.packPrice ?? 0) || 0;
+                            const unitPrice = Number(row.unitPrice ?? (unitsInBox > 0 ? packPrice / unitsInBox : 0)) || 0;
+                            const totalSum = boxCount * packPrice;
+                            return (
+                              <tr key={row.lineId} className="border-t border-[#5A5A40]/10 align-top">
+                                <td className="px-3 py-2 font-semibold text-[#5A5A40]">{row.name}</td>
+                                <td className="px-3 py-2 whitespace-nowrap">{boxCount}</td>
+                                <td className="px-3 py-2 whitespace-nowrap">{totalUnits}</td>
+                                <td className="px-3 py-2 whitespace-nowrap">{Number.isFinite(packPrice) ? packPrice.toFixed(2) : "0.00"}</td>
+                                <td className="px-3 py-2 whitespace-nowrap">{Number.isFinite(unitPrice) ? unitPrice.toFixed(2) : "0.00"}</td>
+                                <td className="px-3 py-2 whitespace-nowrap">{Number.isFinite(totalSum) ? totalSum.toFixed(2) : "0.00"}</td>
+                                <td className="px-3 py-2 text-[11px] text-amber-800">{row.warnings || 'Без предупреждений'}</td>
+                                <td className="px-3 py-2 whitespace-nowrap">
+                                  {row.needsReview ? (
+                                    <span className="text-amber-700 bg-amber-100 px-2 py-0.5 rounded">Нужна проверка</span>
+                                  ) : (
+                                    <span className="text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">OK</span>
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })}
                         </tbody>
                       </table>
                     </div>
@@ -645,10 +698,11 @@ export const ImportInvoiceModal: React.FC<ImportInvoiceModalProps> = ({ isOpen, 
                     <thead>
                       <tr className="bg-[#f5f5f0]/50 text-[10px] uppercase tracking-widest text-[#5A5A40]/50 font-bold">
                         <th className="px-4 py-4">№ ({items.length})</th>
-                        <th className="px-4 py-4">Название (рус.)</th>
+                        <th className="px-4 py-4">Товар</th>
                         <th className="px-4 py-4">Срок годности</th>
-                        <th className="px-4 py-4">Кол-во</th>
-                        <th className="px-4 py-4">Цена за ед.</th>
+                        <th className="px-4 py-4">Количество</th>
+                        <th className="px-4 py-4">Цена за упаковку</th>
+                        <th className="px-4 py-4">Цена за штуку</th>
                         <th className="px-4 py-4">Сумма</th>
                         <th className="px-6 py-4 text-right"></th>
                       </tr>
@@ -664,8 +718,9 @@ export const ImportInvoiceModal: React.FC<ImportInvoiceModalProps> = ({ isOpen, 
                           </td>
                           <td className="px-4 py-4"><input type="date" value={item.expiryDate} onChange={(e) => updateItem(item.lineId, 'expiryDate', e.target.value)} className="w-32 bg-white border border-[#5A5A40]/10 rounded-lg px-2 py-1 text-xs" /></td>
                           <td className="px-4 py-4"><input type="number" min="0" value={item.quantity} onChange={(e) => updateItem(item.lineId, 'quantity', parseInt(e.target.value) || 0)} className="w-16 bg-white border border-[#5A5A40]/10 rounded-lg px-2 py-1 text-xs" /></td>
-                          <td className="px-4 py-4"><input type="number" step="0.01" min="0" value={item.costPrice} onChange={(e) => updateItem(item.lineId, 'costPrice', parseFloat(e.target.value) || 0)} className="w-24 bg-white border border-[#5A5A40]/10 rounded-lg px-2 py-1 text-xs" /></td>
-                          <td className="px-4 py-4"><span className="text-xs font-bold text-[#5A5A40]">{(item.quantity * item.costPrice).toFixed(2)} TJS</span></td>
+                          <td className="px-4 py-4"><input type="number" step="0.01" min="0" value={item.packPrice} onChange={(e) => updateItem(item.lineId, 'packPrice', parseFloat(e.target.value) || 0)} className="w-24 bg-white border border-[#5A5A40]/10 rounded-lg px-2 py-1 text-xs" /></td>
+                          <td className="px-4 py-4"><input type="number" step="0.01" min="0" value={item.unitPrice} onChange={(e) => updateItem(item.lineId, 'unitPrice', parseFloat(e.target.value) || 0)} className="w-24 bg-white border border-[#5A5A40]/10 rounded-lg px-2 py-1 text-xs" /></td>
+                          <td className="px-4 py-4"><span className="text-xs font-bold text-[#5A5A40]">{item.total.toFixed(2)} TJS</span></td>
                           <td className="px-6 py-4 text-right">
                             <button type="button" onClick={() => removeItem(item.lineId)} className="p-1.5 text-[#5A5A40]/30 hover:text-red-500">
                               <Trash2 size={16} />

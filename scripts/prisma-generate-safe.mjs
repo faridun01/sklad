@@ -42,7 +42,7 @@ try {
       process.stderr.write(error.stderr.toString());
     }
     console.warn('[prisma-generate-safe] Prisma generate hit a Windows file lock, but an existing client and query engine are already present.');
-    console.warn('[prisma-generate-safe] Continuing the build with the existing generated client. If you changed prisma/schema.prisma, stop PharmaPro processes and rerun prisma generate manually.');
+    console.warn('[prisma-generate-safe] Continuing the build with the existing generated client. If you changed prisma/schema.prisma, stop PharmaPro на Мой Склад processes and rerun prisma generate manually.');
     process.exit(0);
   }
 

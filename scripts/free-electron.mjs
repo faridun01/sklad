@@ -12,8 +12,8 @@ function safeExec(command) {
 if (process.platform === 'win32') {
   // Kill stale Electron instances that keep single-instance lock in dev.
   safeExec('taskkill /F /IM electron.exe');
-  safeExec('taskkill /F /IM PharmaPro.exe');
+  safeExec('taskkill /F /IM PharmaPro на Мой Склад.exe');
 } else if (process.platform === 'darwin' || process.platform === 'linux') {
   safeExec('pkill -f electron');
-  safeExec('pkill -f PharmaPro');
+  safeExec('pkill -f "PharmaPro на Мой Склад"');
 }

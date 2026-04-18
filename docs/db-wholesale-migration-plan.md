@@ -1,4 +1,4 @@
-# PharmaPro Wholesale DB Migration Plan
+# PharmaPro на Мой Склад Wholesale DB Migration Plan
 
 ## Goal
 

@@ -1,6 +1,6 @@
 {
   "name": "sklad",
-  "description": "PharmaPro — Pharmacy Retail Management System",
+  "description": "Мой склад — Система управления розничной торговлей",
   "author": "Sklad Team",
   "private": true,
   "version": "1.0.0",
@@ -99,6 +99,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22.14.0",
     "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
     "@vitest/coverage-v8": "^4.1.4",
     "autoprefixer": "^10.4.21",
     "concurrently": "^9.2.1",

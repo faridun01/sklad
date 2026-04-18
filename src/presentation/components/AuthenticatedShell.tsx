@@ -174,7 +174,7 @@ export default function AuthenticatedShell({ onSignedOut, onClose }: { onSignedO
       group: 'Торговля', items: [
         { id: 'pos' as SidebarView, label: 'Кассовый терминал', icon: ShoppingCart },
         { id: 'invoices' as SidebarView, label: 'История продаж', icon: Pill },
-        { id: 'debts' as SidebarView, label: 'Должники', icon: Clock },
+        { id: 'debts' as SidebarView, label: 'Клиенты', icon: Clock },
         { id: 'returns' as SidebarView, label: 'Возвраты', icon: RotateCcw },
         { id: 'inventory' as SidebarView, label: 'Инвентарь', icon: Package },
         { id: 'shifts' as SidebarView, label: 'Смены', icon: Clock },
@@ -305,7 +305,7 @@ export default function AuthenticatedShell({ onSignedOut, onClose }: { onSignedO
         <header className="h-24 bg-white/80 backdrop-blur-md border-b border-[#5A5A40]/5 flex items-center justify-between px-10 shrink-0 z-20">
           <div className="flex flex-col">
             <h2 className="text-2xl font-normal text-[#151619] tracking-tight">
-              {menuItems.flatMap(g => g.items).find((m: any) => m.id === currentView)?.label || 'PharmaPro'}
+              {menuItems.flatMap(g => g.items).find((m: any) => m.id === currentView)?.label || 'Мой Склад'}
             </h2>
             <p className="text-[10px] text-[#5A5A40]/50 uppercase tracking-[0.2em] font-normal">{new Date().toLocaleDateString('ru-RU', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
           </div>
@@ -333,7 +333,7 @@ export default function AuthenticatedShell({ onSignedOut, onClose }: { onSignedO
             <span className="w-1 h-1 bg-[#5A5A40]/20 rounded-full"></span>
             <span>Система активна</span>
           </div>
-          <span>© 2026 PharmaPro Systems</span>
+          <span>© 2026 Мой Склад Systems</span>
         </footer>
       </main>
     </div>

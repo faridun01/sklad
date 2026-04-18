@@ -32,7 +32,7 @@ const getSupplierOverview = async (supplierId: string) => {
           select: {
             quantity: true,
             lineTotal: true,
-            purchasePrice: true,
+            unitPrice: true,
             product: { select: { name: true, sku: true } }
           },
         },
@@ -82,7 +82,7 @@ const getSupplierOverview = async (supplierId: string) => {
         productName: item.product?.name || 'Товар',
         sku: item.product?.sku || '',
         quantity: Number(item.quantity || 0),
-        unitCost: Number(item.purchasePrice || 0),
+        unitCost: Number(item.unitPrice || 0),
         lineTotal: Number(item.lineTotal || 0)
       })) || []
     };

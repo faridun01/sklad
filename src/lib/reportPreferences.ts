@@ -39,8 +39,8 @@ const templateKey = (userId: string) => `pharmapro_report_templates_${userId}`;
 const preferencesKey = (userId: string) => `pharmapro_report_preferences_${userId}`;
 
 export const defaultCompanyReportProfile: CompanyReportProfile = {
-  pharmacyName: 'Аптека PharmaPro',
-  legalName: 'ООО PharmaPro',
+  pharmacyName: 'Аптека Мой Склад',
+  legalName: 'ООО Мой Склад',
   address: 'Dushanbe',
   taxId: '000000000',
   phone: '',

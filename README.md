@@ -2,7 +2,7 @@
 <img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
 </div>
 
-# PharmaPro
+# PharmaPro на Мой Склад
 
 Desktop pharmacy management system built with Electron, React, Express, and Prisma.
 
@@ -48,7 +48,7 @@ Before building, create `.env.production` or `.env.production.local` from `.env.
 Runtime configuration for the packaged app is resolved in this order:
 
 1. `%APPDATA%/pharmapro/.env`
-2. `.env` next to `PharmaPro.exe`
+2. `.env` next to `PharmaPro на Мой Склад.exe`
 3. `resources/.env` bundled with the app
 
 Notes:

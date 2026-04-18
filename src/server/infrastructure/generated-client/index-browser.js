@@ -447,11 +447,10 @@ exports.Prisma.PurchaseInvoiceItemScalarFieldEnum = {
   productId: 'productId',
   batchNumber: 'batchNumber',
   manufacturedDate: 'manufacturedDate',
-  expiryDate: 'expiryDate',
   quantity: 'quantity',
-  purchasePrice: 'purchasePrice',
-  wholesalePrice: 'wholesalePrice',
-  retailPrice: 'retailPrice',
+  packPrice: 'packPrice',
+  unitPrice: 'unitPrice',
+  total: 'total',
   lineDiscount: 'lineDiscount',
   lineTotal: 'lineTotal'
 };
