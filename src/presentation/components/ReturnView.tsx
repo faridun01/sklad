@@ -2,12 +2,12 @@ import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { usePharmacy } from '../context';
 import { buildApiHeaders } from '../../infrastructure/api';
-import { formatProductDisplayName } from '../../lib/productDisplay';
+
 import { useCurrencyCode } from '../../lib/useCurrencyCode';
 import { runRefreshTasks } from '../../lib/utils';
 import { 
   Plus, CheckCircle2, XCircle, Clock, RefreshCw, ChevronDown, Package, Printer,
-  Store, Truck, ClipboardList, Filter, CalendarDays, Search, Wallet
+  Store, Truck, ClipboardList, Wallet
 } from 'lucide-react';
 import { AppModal } from './AppModal';
 import { DateRangeFilter, ReportRangePreset } from './common/DateRangeFilter';
@@ -50,7 +50,7 @@ type ReturnFormItem = {
   unitPrice: number;
 };
 
-const formatPackQuantity = (quantity: number) => `${Math.max(0, Math.floor(Number(quantity || 0)))} ед.`;
+
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
   DRAFT: { label: 'Черновик', color: 'text-amber-500 bg-amber-50 border-amber-100', icon: Clock },
@@ -199,14 +199,14 @@ function CreateReturnModal({
 }
 
 export const ReturnView: React.FC = () => {
-  const { t } = useTranslation();
+  const { } = useTranslation();
   const currencyCode = useCurrencyCode();
-  const { products, refreshProducts } = usePharmacy();
+  const { refreshProducts } = usePharmacy();
   const [returns, setReturns] = useState<Return[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [actionPending, setActionPending] = useState<string | null>(null);
+  const [, setActionPending] = useState<string | null>(null);
   const [typeFilter, setTypeFilter] = useState<'ALL' | 'RETAIL' | 'SUPPLIER'>('ALL');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'DRAFT' | 'COMPLETED' | 'REJECTED'>('ALL');
   const [preset, setPreset] = useState<ReportRangePreset>('month');

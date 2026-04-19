@@ -198,7 +198,7 @@ function CreateWriteOffModal({
   const addItem = () => setFormItems((prev) => [...prev, { productId: '', batchId: '', quantity: 1 }]);
   const removeItem = (idx: number) => setFormItems((prev) => prev.filter((_, i) => i !== idx));
 
-  const updateItemPackaging = (idx: number, boxesValue: string, unitsValue: string) => {
+  const updateItemPackaging = (idx: number, _boxesValue: string, unitsValue: string) => {
     setFormItems((prev) => {
       const next = [...prev];
       next[idx] = {

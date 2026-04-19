@@ -1,13 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { usePharmacy } from '../context';
 import { buildApiHeaders } from '../../infrastructure/api';
 import { defaultCompanyReportProfile, type CompanyReportProfile } from '../../lib/reportPreferences';
 import { UsersAdminPanel } from './UsersAdminPanel';
 import { AuditLogPanel } from './AuditLogPanel';
-import { ExportPanel } from './ExportPanel';
 import { AnimatePresence, motion } from 'motion/react';
-import i18n from '../../lib/i18n';
 import { AppModal } from './AppModal';
 import {
   defaultUserSettingsPreferences,
@@ -16,7 +14,7 @@ import {
 import {
   LogOut,
   ShieldAlert,
-  Wrench,
+
   CheckCircle2,
   RefreshCw,
   Save,
@@ -52,7 +50,7 @@ type PasswordForm = {
 type ActiveTab = 'profile' | 'notifications' | 'company' | 'system' | 'users';
 
 export const SettingsView: React.FC = () => {
-  const { t } = useTranslation();
+  useTranslation();
   const { user, logout } = usePharmacy();
 
   const [activeTab, setActiveTab] = useState<ActiveTab>('profile');

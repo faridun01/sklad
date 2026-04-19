@@ -3,7 +3,7 @@ import { authenticate, requireRole, type AuthedRequest } from '../../common/auth
 import { asyncHandler } from '../../common/http';
 import { prisma } from '../../infrastructure/prisma';
 import { productService } from './product.service';
-import { parseAuditJson } from '../../common/utils';
+
 import { NotFoundError, ValidationError } from '../../common/errors';
 
 export const productsRouter = Router();

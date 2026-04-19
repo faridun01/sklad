@@ -47,11 +47,7 @@ type CamelotExtractResult = {
   issues?: string[];
 };
 
-type RenderedPdfPage = {
-  imageBase64: string;
-  mimeType: string;
-  pageCount?: number;
-};
+
 
 export type ProcessPdfDocumentResult = {
   pdfType: PdfType;
@@ -62,9 +58,8 @@ export type ProcessPdfDocumentResult = {
 
 const PYTHON_EXECUTABLE = process.env.PYTHON_EXECUTABLE || 'c:/python313/python.exe';
 const CAMELOT_SCRIPT = path.join(process.cwd(), 'scripts', 'pdf_camelot_extract.py');
-const PDF_RENDER_SCRIPT = path.join(process.cwd(), 'scripts', 'pdf_render_page.py');
 const PDF_PARSE_TIMEOUT_MS = Number(process.env.PDF_PARSE_TIMEOUT_MS || 30000);
-const PDF_RENDER_TIMEOUT_MS = Number(process.env.PDF_RENDER_TIMEOUT_MS || 30000);
+
 
 let pdfParseLoader: Promise<PdfParseCtor> | null = null;
 
@@ -138,17 +133,7 @@ const normalizeUnit = (value: unknown) => {
   return normalized;
 };
 
-const normalizeHeader = (value: string) =>
-  normalizeTextValue(value)
-    .toLowerCase()
-    .replace(/[қќ]/g, 'к')
-    .replace(/[ҳ]/g, 'х')
-    .replace(/[ғ]/g, 'г')
-    .replace(/[ҷ]/g, 'ж')
-    .replace(/[ӯ]/g, 'у')
-    .replace(/[ӣ]/g, 'и')
-    .replace(/[ё]/g, 'е')
-    .replace(/[\s_\-./\\()]/g, '');
+
 
 const detectTableLikeText = (rawText: string) => {
   const lines = rawText.split('\n').map((line) => line.trim()).filter(Boolean);
@@ -374,10 +359,7 @@ export function convertToOcrFormat(params: {
   };
 }
 
-const renderPdfPageForVision = async (fileBuffer: Buffer) =>
-  runPythonJsonProcess<RenderedPdfPage>(PDF_RENDER_SCRIPT, {
-    pdfBase64: fileBuffer.toString('base64'),
-  }, PDF_RENDER_TIMEOUT_MS);
+
 
 export async function processPdfDocument(pdfBase64: string): Promise<ProcessPdfDocumentResult> {
   const fileBuffer = Buffer.from(pdfBase64, 'base64');

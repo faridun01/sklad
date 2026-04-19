@@ -1,4 +1,4 @@
-import { prisma, Prisma } from '../../infrastructure/prisma';
+import { prisma } from '../../infrastructure/prisma';
 import { z } from 'zod';
 
 export const ReportParamsSchema = z.object({
@@ -509,7 +509,7 @@ export class ReportService {
     };
   }
   async getDebtsReport(params: ReportParams) {
-    const { fromDate, toDate } = resolveRange(params);
+    resolveRange(params);
     
     const debts = await prisma.invoice.findMany({
       where: {

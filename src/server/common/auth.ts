@@ -1,5 +1,4 @@
 import type { NextFunction, Request, Response } from 'express';
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { ForbiddenError, UnauthorizedError } from './errors';
 import { prisma } from '../infrastructure/prisma';
@@ -15,7 +14,6 @@ export type AuthedRequest = Request & { user: JwtUser };
 
 const DEV_ADMIN_EMAIL = 'admin@sklad.local';
 const DEV_ADMIN_USERNAME = 'admin';
-const DEV_ADMIN_PASSWORD = 'admin123';
 const DEV_ADMIN_PASSWORD_HASH = '$2b$10$wnlS.eRxOglKIuDgS8Nycu.g/VcgDSHkwTRNjvIx9ZSPoJZww9/ey';
 const PRODUCTION_BOOTSTRAP_HINT = 'Run `npm run bootstrap:admin -- --email owner@example.com --password <strong-password> --name "Owner" --role OWNER` before first production login.';
 

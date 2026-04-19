@@ -1,7 +1,6 @@
 import { prisma } from '../infrastructure/prisma';
 
 export const normalizeProductName = (value: string) => value.trim().replace(/\s+/g, ' ').toLocaleLowerCase('ru-RU');
-const normalizeCountry = (value: string | null | undefined) => String(value || '').trim().replace(/\s+/g, ' ').toLocaleLowerCase('ru-RU');
 
 export async function findExistingProductByName(name: string, countryOfOrigin?: string | null) {
   const normalizedName = normalizeProductName(name || '');

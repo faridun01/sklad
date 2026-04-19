@@ -5,7 +5,7 @@ import { buildApiHeaders } from '../../../infrastructure/api';
 import { ExpiryItem } from './types';
 
 export const ReportExpirySection: React.FC = () => {
-  const { t } = useTranslation();
+  useTranslation();
   const [items, setItems] = useState<ExpiryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'expired' | 'critical' | 'warning'>('all');

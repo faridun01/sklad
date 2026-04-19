@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Clock,
   CheckCircle2,
   RefreshCw,
   TrendingUp,
-  TrendingDown,
+
   DollarSign,
   ArrowUpCircle,
   ArrowDownCircle,

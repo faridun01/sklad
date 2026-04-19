@@ -62,12 +62,7 @@ export const NotificationsView: React.FC<NotificationsViewProps> = ({ notificati
     return 'bg-blue-50 text-blue-500';
   };
 
-  const getActionLabel = (type: NotificationItem['type']) => {
-    if (type === 'LOW_STOCK') return 'Открыть остатки';
-    if (type === 'EXPIRY') return 'Проверить партии';
-    if (type === 'PAYMENT_DUE' || type === 'OVERDUE_PAYMENT') return 'Открыть оплату';
-    return 'Открыть отчет';
-  };
+
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">

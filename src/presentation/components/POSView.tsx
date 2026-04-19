@@ -1,17 +1,13 @@
-import React, { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { usePharmacy } from '../context';
 import { buildApiHeaders } from '../../infrastructure/api';
 import { saveLatestClosedShiftNotice } from '../../lib/shiftCloseNotice';
 import { CloseShiftModal, OpenShiftModal } from './ShiftView';
 import {
   AlertCircle,
-  Barcode,
-  CheckCircle2,
-  CircleAlert,
   CreditCard,
   Minus,
   Plus,
-  RefreshCw,
   Search,
   ShoppingCart,
   Trash2,
@@ -150,7 +146,7 @@ export const POSView: React.FC = () => {
   const { products, refreshProducts, processTransaction, user, customers, refreshCustomers, createCustomer } = usePharmacy();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [barcodeInput, setBarcodeInput] = useState('');
+  const [_barcodeInput, _setBarcodeInput] = useState('');
   const [paymentType, setPaymentType] = useState<'CASH' | 'CARD' | 'CREDIT'>('CASH');
   const [customerId, setCustomerId] = useState('');
   const [newCustomerName, setNewCustomerName] = useState('');
@@ -160,15 +156,15 @@ export const POSView: React.FC = () => {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeShift, setActiveShift] = useState<ActiveShift | null>(null);
-  const [shiftLoading, setShiftLoading] = useState(true);
-  const [shiftError, setShiftError] = useState<string | null>(null);
+  const [, setShiftLoading] = useState(true);
+  const [, setShiftError] = useState<string | null>(null);
   const [isOpenShiftModal, setIsOpenShiftModal] = useState(false);
   const [isCloseShiftModal, setIsCloseShiftModal] = useState(false);
-  const [recentSales, setRecentSales] = useState<any[]>([]);
-  const [closedShiftSummary, setClosedShiftSummary] = useState<ClosedShiftSummary | null>(null);
+  const [, setRecentSales] = useState<any[]>([]);
+  const [, setClosedShiftSummary] = useState<ClosedShiftSummary | null>(null);
   const barcodeInputRef = useRef<HTMLInputElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const [barcodeScanning, setBarcodeScanning] = useState(false);
+  const [, _setBarcodeScanning] = useState(false);
 
   useEffect(() => { if (customers.length === 0) void refreshCustomers(); }, [customers.length, refreshCustomers]);
 

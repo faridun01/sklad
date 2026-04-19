@@ -31,14 +31,7 @@ type ParsedInvoiceItem = {
 
 const DEFAULT_BATCH_UNIT = 'units';
 
-const getBatchStatus = (expiryDate: Date): 'CRITICAL' | 'STABLE' | 'NEAR_EXPIRY' | 'EXPIRED' => {
-  const now = new Date();
-  const diffDays = Math.floor((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-  if (diffDays < 0) return 'EXPIRED';
-  if (diffDays <= 30) return 'CRITICAL';
-  if (diffDays <= 90) return 'NEAR_EXPIRY';
-  return 'STABLE';
-};
+
 
 // --- Shared helpers ---
 

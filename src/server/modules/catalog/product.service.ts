@@ -1,4 +1,4 @@
-import { Prisma, ProductStatus } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { prisma } from '../../infrastructure/prisma';
 import { auditService } from '../../services/audit.service';
 import { findExistingProductByName } from '../../common/productName';

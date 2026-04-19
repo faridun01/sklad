@@ -4,7 +4,6 @@ import {
   Menu, 
   X, 
   Pill,
-  ChevronRight
 } from 'lucide-react';
 import { User } from '../../core/domain';
 

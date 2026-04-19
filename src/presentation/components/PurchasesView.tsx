@@ -8,17 +8,15 @@ import {
   ChevronRight,
   AlertCircle,
   Truck,
-  Box,
-  Calendar,
   RefreshCw,
   TrendingUp,
   Package
 } from 'lucide-react';
-import { usePharmacy } from '../context';
+
 import { buildApiHeaders } from '../../infrastructure/api';
 
 export const PurchasesView: React.FC = () => {
-  const { suppliers } = usePharmacy();
+
   const [invoices, setInvoices] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');

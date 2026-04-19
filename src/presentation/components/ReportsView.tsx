@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Calendar, FileDown, FileSpreadsheet, AlertCircle, Eye, Printer, Filter, ChartBar, TrendingUp, Inbox, RefreshCw } from 'lucide-react';
+import React, { useCallback, useEffect, useState } from 'react';
+
+import { FileDown, FileSpreadsheet, AlertCircle, Printer, Filter, ChartBar, TrendingUp, Inbox, RefreshCw } from 'lucide-react';
 import { buildApiHeaders } from '../../infrastructure/api';
 import { useCurrencyCode } from '../../lib/useCurrencyCode';
 
@@ -22,7 +22,7 @@ const formatMoney = (amount: number, currency = 'TJS') => {
 };
 
 export const ReportsView: React.FC = () => {
-  const { t } = useTranslation();
+
   const currencyCode = useCurrencyCode();
 
   // State

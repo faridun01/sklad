@@ -6,7 +6,6 @@ import {
   Clock, 
   ChevronRight, 
   X,
-  Pill,
   Package
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';

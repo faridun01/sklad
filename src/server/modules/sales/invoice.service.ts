@@ -1,7 +1,7 @@
-import { prisma, Prisma } from '../../infrastructure/prisma';
+import { prisma } from '../../infrastructure/prisma';
 import { auditService } from '../../services/audit.service';
 import { NotFoundError, ValidationError } from '../../common/errors';
-import { computeProductStatus } from '../../common/productStatus';
+
 import { stockService } from '../../services/stock.service';
 import { z } from 'zod';
 
@@ -40,21 +40,7 @@ const generateReturnNo = () => {
   return `RET-${ts}-${rand}`;
 };
 
-const mapPaymentType = (value: string | undefined): 'CASH' | 'CARD' => {
-  const normalized = (value || 'CASH').toUpperCase();
-  if (normalized === 'CASH' || normalized === 'CARD') {
-    return normalized as any;
-  }
-  return 'CASH';
-};
 
-const mapRefundMethod = (value: string | undefined): 'CASH' | 'CARD' => {
-  const normalized = (value || 'CASH').toUpperCase();
-  if (normalized === 'CASH' || normalized === 'CARD') {
-    return normalized as any;
-  }
-  return 'CASH';
-};
 
 const mapPaymentMethod = (value: string | undefined): 'CASH' | 'CARD' | 'BANK_TRANSFER' => {
   const normalized = (value || 'CASH').toUpperCase();
