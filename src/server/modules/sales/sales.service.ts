@@ -4,7 +4,6 @@ import { NotFoundError, ValidationError } from '../../common/errors';
 import { computeProductStatus } from '../../common/productStatus';
 import { reportCache } from '../../common/cache';
 import { computeBatchStatus } from '../../common/batchStatus';
-import { stockService } from '../../services/stock.service';
 import { round } from '../../common/utils';
 
 export type SaleItemInput = {
