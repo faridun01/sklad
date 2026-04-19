@@ -1,9 +1,9 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
-const startupStartedAtArg = process.argv.find((arg) => arg.startsWith('--pharmapro-started-at='));
+const startupStartedAtArg = process.argv.find((arg) => arg.startsWith('--sklad-started-at=') || arg.startsWith('--pharmapro-started-at='));
 const startupStartedAt = startupStartedAtArg ? Number(startupStartedAtArg.split('=')[1]) : null;
 
-contextBridge.exposeInMainWorld('pharmaproDesktop', {
+const bridge = {
   platform: process.platform,
   startupStartedAt: Number.isFinite(startupStartedAt) ? startupStartedAt : null,
   versions: {
@@ -25,4 +25,7 @@ contextBridge.exposeInMainWorld('pharmaproDesktop', {
     details,
     rendererTs: Date.now(),
   }),
-});
+};
+
+contextBridge.exposeInMainWorld('skladDesktop', bridge);
+contextBridge.exposeInMainWorld('pharmaproDesktop', bridge); // Legacy for transition

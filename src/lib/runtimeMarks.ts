@@ -2,14 +2,14 @@ type RuntimeMarkDetails = Record<string, unknown>;
 
 const getMarkStore = (): Record<string, boolean> => {
   const runtimeWindow = window as Window & {
-    __pharmaproRuntimeMarks?: Record<string, boolean>;
+    __skladRuntimeMarks?: Record<string, boolean>;
   };
 
-  if (!runtimeWindow.__pharmaproRuntimeMarks) {
-    runtimeWindow.__pharmaproRuntimeMarks = {};
+  if (!runtimeWindow.__skladRuntimeMarks) {
+    runtimeWindow.__skladRuntimeMarks = {};
   }
 
-  return runtimeWindow.__pharmaproRuntimeMarks;
+  return runtimeWindow.__skladRuntimeMarks;
 };
 
 export const markRuntimeOnce = (name: string, details?: RuntimeMarkDetails) => {
@@ -23,5 +23,5 @@ export const markRuntimeOnce = (name: string, details?: RuntimeMarkDetails) => {
   }
 
   markStore[name] = true;
-  window.pharmaproDesktop?.markRuntime?.(name, details);
+  window.skladDesktop?.markRuntime?.(name, details);
 };

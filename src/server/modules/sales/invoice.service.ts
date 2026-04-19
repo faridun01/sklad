@@ -499,35 +499,9 @@ export class InvoiceService {
       });
 
       if (!invoice) throw new NotFoundError('Invoice not found');
-      
-      // Logic for deleting: roll back stock, roll back payments, mark as CANCELLED or delete
-      // In this system, we mark as inactive/cancelled to preserve audit trail
-      
-      for (const item of invoice.items) {
-        if (item.batchId) {
-          await tx.batch.update({
-            where: { id: item.batchId },
-            data: { 
-              quantity: { increment: item.quantity },
-              availableQty: { increment: item.quantity },
-              currentQty: { increment: item.quantity },
-            }
-          });
 
-          await tx.product.update({
-            where: { id: item.productId },
-            data: { totalStock: { increment: item.quantity } }
-          });
-
-          const b = await tx.batch.findUnique({ where: { id: item.batchId }, select: { warehouseId: true } });
-          if (b?.warehouseId) {
-            await tx.warehouseStock.update({
-              where: { warehouseId_productId: { warehouseId: b.warehouseId, productId: item.productId } },
-              data: { quantity: { increment: item.quantity } }
-            });
-          }
-        }
-      }
+      // Deleting a sales invoice from history should not restore inventory.
+      // Stock can only return via an explicit return flow, otherwise inventory is inflated.
 
       await tx.invoice.update({
         where: { id: invoiceId },

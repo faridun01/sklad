@@ -4,7 +4,7 @@ import { User } from './core/domain';
 import { LoginView } from './presentation/components/LoginView';
 import { clearStoredAuthSession, getStoredAuthUser, loginWithPassword } from './lib/authSession';
 
-window.pharmaproDesktop?.markRuntime?.('app-module-evaluated', {
+window.skladDesktop?.markRuntime?.('app-module-evaluated', {
   ts: Date.now(),
 });
 
@@ -66,7 +66,7 @@ const App: React.FC = () => {
   const [status, setStatus] = React.useState('Запуск системы...');
   const [error, setError] = React.useState<string | null>(null);
   const [backingUp, setBackingUp] = React.useState(false);
-  const desktopControls = window.pharmaproDesktop?.controls;
+  const desktopControls = window.skladDesktop?.controls;
   // Capture the exact moment the renderer starts to ensure 3s mandatory visibility
   const [appStartupStartedAt] = React.useState(Date.now());
 
@@ -132,18 +132,9 @@ const App: React.FC = () => {
         const MIN_SPLASH_TIME = 3000; // Mandatory 3 seconds
         const remainingTime = Math.max(0, MIN_SPLASH_TIME - elapsed);
         
-        setTimeout(async () => {
+        setTimeout(() => {
           setShowSplash(false);
           polling = false;
-          
-          if (!user && import.meta.env.DEV) {
-            try {
-              setStatus('Авторизация...');
-              await handleLogin('admin@pharmapro.com', 'dev-password');
-            } catch (err) {
-              console.warn('Auto-login failed, showing login screen');
-            }
-          }
         }, remainingTime);
       } else {
         attempts++;
@@ -173,8 +164,8 @@ const App: React.FC = () => {
   const handleSaveConfig = async (url: string) => {
     setStatus('Применение настроек...');
     try {
-      if (window.pharmaproDesktop?.saveDatabaseConfig) {
-        const result = await window.pharmaproDesktop.saveDatabaseConfig(url);
+      if (window.skladDesktop?.saveDatabaseConfig) {
+        const result = await window.skladDesktop.saveDatabaseConfig(url);
         if (result?.success) {
           setStatus('Перезапуск сервера...');
           // The polling in useEffect will automatically pick up the new server
@@ -190,21 +181,21 @@ const App: React.FC = () => {
   };
 
   const handleSafeClose = async () => {
-    if (!window.pharmaproDesktop) {
+    if (!window.skladDesktop) {
        window.close();
        return;
     }
 
     const today = new Date().toISOString().split('T')[0];
-    const lastBackup = localStorage.getItem('pharmapro_last_backup_date');
+    const lastBackup = localStorage.getItem('sklad_last_backup_date');
 
     if (lastBackup !== today) {
        setBackingUp(true);
        try {
-          const res = await (window.pharmaproDesktop as any).performBackup();
-          if (res.success) {
-             localStorage.setItem('pharmapro_last_backup_date', today);
-          } else {
+           const res = await (window.skladDesktop as any).performBackup();
+           if (res.success) {
+              localStorage.setItem('sklad_last_backup_date', today);
+           } else {
              console.error('Backup failed:', res.error);
              if (!confirm('Не удалось создать резервную копию. Продолжить закрытие?')) {
                 setBackingUp(false);
@@ -217,7 +208,7 @@ const App: React.FC = () => {
        setBackingUp(false);
     }
 
-    window.pharmaproDesktop?.controls?.close();
+    window.skladDesktop?.controls?.close();
   };
 
   return (

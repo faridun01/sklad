@@ -10,9 +10,9 @@ const PORT = Number(process.env.PORT || 3921);
 
 // In the packaged Electron app, the backend runs from app.asar.unpacked/dist-server/.
 // The frontend dist/ is inside app.asar — the Electron main process passes the correct
-// asar-based path via PHARMAPRO_DIST_PATH so the spawned Node.js process (which has
+// asar-based path via SKLAD_DIST_PATH so the spawned Node.js process (which has
 // Electron's asar fs patching active via ELECTRON_RUN_AS_NODE=1) can serve it.
-const distPath = process.env.PHARMAPRO_DIST_PATH ?? path.join(__dirname, '../dist');
+const distPath = process.env.SKLAD_DIST_PATH ?? process.env.PHARMAPRO_DIST_PATH ?? path.join(__dirname, '../dist');
 
 app.use(express.static(distPath));
 app.get('*', (_req, res) => {

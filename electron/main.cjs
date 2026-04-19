@@ -16,6 +16,7 @@ const resolveRuntimeEnvPath = () => {
   })();
 
   const envCandidates = [
+    process.env.SKLAD_ENV_FILE,
     process.env.PHARMAPRO_ENV_FILE,
     userDataDir ? path.join(userDataDir, '.env') : null,
     exeDir ? path.join(exeDir, '.env') : null,
@@ -259,7 +260,7 @@ const loadDevAppWithRetry = async (window, timeoutMs = 15000) => {
       await window.loadURL(DEV_SERVER_URL);
       writeRuntimeLog('dev-server-loaded', { url: DEV_SERVER_URL });
 
-      if (process.env.PHARMAPRO_OPEN_DEVTOOLS === '1') {
+      if (process.env.SKLAD_OPEN_DEVTOOLS === '1' || process.env.PHARMAPRO_OPEN_DEVTOOLS === '1') {
         window.webContents.openDevTools({ mode: 'detach' });
       }
       return;
@@ -340,6 +341,7 @@ const startInternalBackend = async () => {
       // app.getAppPath() returns the asar path; the spawned Electron Node.js
       // process (ELECTRON_RUN_AS_NODE=1) has asar fs-patching active and can
       // read files from inside the asar archive.
+      SKLAD_DIST_PATH: path.join(app.getAppPath(), 'dist'),
       PHARMAPRO_DIST_PATH: path.join(app.getAppPath(), 'dist'),
       // Tell the backend's env.ts where to find the .env file so dotenv.config()
       // can load DATABASE_URL even in standalone (non-project-root) deployments.
@@ -371,7 +373,7 @@ function createWindow() {
       contextIsolation: true,
       sandbox: true,
       preload: preloadPath,
-      additionalArguments: [`--pharmapro-started-at=${appStartupStartedAt}`],
+      additionalArguments: [`--sklad-started-at=${appStartupStartedAt}`, `--pharmapro-started-at=${appStartupStartedAt}`],
     },
     icon: windowIcon,
     title: 'Sklad Management System',
@@ -655,7 +657,7 @@ ipcMain.handle('desktop:perform-backup', async () => {
     const [, user, password, host, port, dbname] = parts;
 
     // Resolve Target Directory
-    const backupDir = 'D:\\pharmapro_backups';
+    const backupDir = 'D:\\sklad_backups';
     if (!fs.existsSync(backupDir)) {
       fs.mkdirSync(backupDir, { recursive: true });
     }
@@ -725,7 +727,7 @@ ipcMain.handle('desktop:check-system-status', async () => {
     pgDumpPath: '',
     diskDReady: false,
     backupDirExists: false,
-    backupDir: 'D:\\pharmapro_backups'
+    backupDir: 'D:\\sklad_backups'
   };
 
   const commonPaths = [

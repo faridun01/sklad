@@ -1,7 +1,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
-window.pharmaproDesktop?.markRuntime?.('i18n-module-evaluated', {
+window.skladDesktop?.markRuntime?.('i18n-module-evaluated', {
   ts: Date.now(),
 });
 
@@ -50,7 +50,7 @@ const resources = {
       Russian: 'Русский',
       'Sign In': 'Войти',
       'Sign Out': 'Выйти',
-      'Email Address': 'Электронная почта',
+
       Password: 'Пароль',
       'POS Terminal': 'Кассовый терминал',
       'Batch Tracking': 'Учет партий',
@@ -200,7 +200,7 @@ const resources = {
       'Everything is up to date.': 'Все данные актуальны.',
       'Profile & Security': 'Профиль и безопасность',
       'Personal Information': 'Личная информация',
-      'Update your name, email, and avatar': 'Обновите имя, почту и аватар',
+      'Update your name and avatar': 'Обновите имя и аватар',
       Edit: 'Изменить',
       'Password & Security': 'Пароль и безопасность',
       'Change password and enable 2FA': 'Смените пароль и включите 2FA',
@@ -436,7 +436,7 @@ i18n.use(initReactI18next).init({
   }
 });
 
-window.pharmaproDesktop?.markRuntime?.('i18n-init-complete', {
+window.skladDesktop?.markRuntime?.('i18n-init-complete', {
   ts: Date.now(),
 });
 

@@ -29,7 +29,7 @@ authRouter.post('/setup-admin', asyncHandler(async (req, res) => {
   validatePassword(String(password));
 
   // Generate internal email to satisfy DB schema if login is not an email
-  const email = login.includes('@') ? login.toLowerCase() : `${login.toLowerCase()}@pharmapro.local`;
+  const email = login.includes('@') ? login.toLowerCase() : `${login.toLowerCase()}@sklad.local`;
   const username = login.toLowerCase();
 
   const hashedPassword = await bcrypt.hash(String(password), 12);

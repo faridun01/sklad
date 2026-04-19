@@ -15,11 +15,11 @@ type DesktopBridge = {
 
 const getDesktopBridge = (): DesktopBridge | undefined => {
   if (typeof window === 'undefined') return undefined;
-  return (window as Window & { pharmaproDesktop?: DesktopBridge }).pharmaproDesktop;
+  return (window as Window & { skladDesktop?: DesktopBridge }).skladDesktop;
 };
 
 export const buildApiHeaders = async (contentType = true) => {
-  const token = window.sessionStorage.getItem('pharmapro_token') || localStorage.getItem('pharmapro_token');
+  const token = window.sessionStorage.getItem('sklad_token') || localStorage.getItem('sklad_token');
   const desktopHeaders = await getDesktopBridge()?.authHeaders?.();
 
   return {

@@ -40,7 +40,6 @@ import {
 
 type UserProfileForm = {
   name: string;
-  email: string;
   username: string;
 };
 
@@ -67,7 +66,6 @@ export const SettingsView: React.FC = () => {
 
   const [profileForm, setProfileForm] = useState<UserProfileForm>({
     name: '',
-    email: '',
     username: '',
   });
   const [passwordForm, setPasswordForm] = useState<PasswordForm>({
@@ -112,10 +110,10 @@ export const SettingsView: React.FC = () => {
   };
 
   const checkStatus = async () => {
-    if (!(window as any).pharmaproDesktop?.checkSystemStatus) return;
+    if (!(window as any).skladDesktop?.checkSystemStatus) return;
     setStatusLoading(true);
     try {
-       const status = await (window as any).pharmaproDesktop.checkSystemStatus();
+       const status = await (window as any).skladDesktop.checkSystemStatus();
        setSystemStatus(status);
     } catch (e) {
        console.error(e);
@@ -127,8 +125,8 @@ export const SettingsView: React.FC = () => {
   const saveDbConfig = async () => {
     const url = `postgresql://${dbConfig.user}:${dbConfig.password}@${dbConfig.host}:${dbConfig.port}/${dbConfig.dbname}`;
     try {
-      if (!(window as any).pharmaproDesktop?.saveDatabaseConfig) return;
-      await (window as any).pharmaproDesktop.saveDatabaseConfig(url);
+      if (!(window as any).skladDesktop?.saveDatabaseConfig) return;
+      await (window as any).skladDesktop.saveDatabaseConfig(url);
       setNotice('Настройки сохранены. Приложение будет перезапущено...');
       setTimeout(() => {
         window.location.reload();
@@ -220,7 +218,6 @@ export const SettingsView: React.FC = () => {
 
         setProfileForm({
           name: String(profileBody.name || ''),
-          email: String(profileBody.email || ''),
           username: String(profileBody.username || ''),
         });
 
@@ -491,7 +488,7 @@ export const SettingsView: React.FC = () => {
                 <div className="space-y-8">
                   <header>
                     <h3 className="text-xl font-normal text-[#151619] tracking-tight mb-2">Личная информация</h3>
-                    <p className="text-xs text-[#5A5A40]/50 italic">Проверьте имя и email, чтобы чеки, отчеты и действия в системе сохранялись с правильными данными.</p>
+                    <p className="text-xs text-[#5A5A40]/50 italic">Проверьте имя, чтобы чеки, отчеты и действия в системе сохранялись с правильными данными.</p>
                   </header>
                   <div className="space-y-4">
                     <div className="space-y-1.5 focus-within:translate-x-1 transition-transform">
@@ -502,14 +499,7 @@ export const SettingsView: React.FC = () => {
                         onChange={(e) => setProfileForm((s) => ({ ...s, name: e.target.value }))} 
                       />
                     </div>
-                    <div className="space-y-1.5 focus-within:translate-x-1 transition-transform">
-                      <label className="text-[9px] uppercase tracking-widest text-[#5A5A40]/40 font-normal px-1">Электронная почта</label>
-                      <input 
-                        className="w-full px-5 py-3.5 bg-[#f8f7f2] border border-transparent rounded-[1.2rem] text-sm font-normal outline-none focus:bg-white focus:border-[#5A5A40]/20 transition-all font-normal" 
-                        value={profileForm.email} 
-                        onChange={(e) => setProfileForm((s) => ({ ...s, email: e.target.value }))} 
-                      />
-                    </div>
+
                     <div className="space-y-1.5 focus-within:translate-x-1 transition-transform">
                       <label className="text-[9px] uppercase tracking-widest text-[#5A5A40]/40 font-normal px-1">Логин</label>
                       <input 

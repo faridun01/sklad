@@ -3,6 +3,7 @@ import { Product, User, Invoice, Supplier } from '../core/domain';
 import { TransactionDTO } from '../application/services';
 import { ApiProductRepository, ApiInvoiceRepository, ApiSupplierRepository, buildApiHeaders } from '../infrastructure/api';
 import { ConsoleLogger } from '../infrastructure/persistence';
+import { clearStoredAuthSession, getStoredAuthUser, loginWithPassword } from '../lib/authSession';
 import { runRefreshTasks } from '../lib/utils';
 
 interface CacheEntry<T> {
@@ -68,7 +69,7 @@ const PharmacyContext = createContext<PharmacyContextType | undefined>(undefined
 const bootstrapLoads = new Map<string, Promise<void>>();
 
 const getBootstrapLoadKey = (user: User | null) => {
-  const token = window.sessionStorage.getItem('pharmapro_token') || localStorage.getItem('pharmapro_token') || 'guest';
+  const token = window.sessionStorage.getItem('sklad_token') || localStorage.getItem('sklad_token') || 'guest';
   return user ? `auth:${user.id}:${token}` : `guest:${token}`;
 };
 
@@ -77,15 +78,7 @@ export const PharmacyProvider: React.FC<{ children: ReactNode }> = ({ children }
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [customers, setCustomers] = useState<any[]>([]);
-  const [user, setUser] = useState<User | null>(() => {
-    const saved = window.sessionStorage.getItem('pharmapro_user');
-    if (!saved) return null;
-    try {
-      return JSON.parse(saved);
-    } catch {
-      return null;
-    }
-  });
+  const [user, setUser] = useState<User | null>(() => getStoredAuthUser());
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -105,19 +98,8 @@ export const PharmacyProvider: React.FC<{ children: ReactNode }> = ({ children }
   const login = async (login: string, password: string) => {
     setError(null);
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ login, password }),
-      });
-      const payload = await response.json().catch(() => null);
-      if (!response.ok) {
-        throw new Error(payload?.error || (response.status === 401 ? 'Invalid credentials' : 'Login failed'));
-      }
-      window.sessionStorage.setItem('pharmapro_token', payload.token);
-      window.sessionStorage.setItem('pharmapro_user', JSON.stringify(payload.user));
-      localStorage.setItem('pharmapro_token', payload.token);
-      setUser(payload.user);
+      const authSession = await loginWithPassword(login, password);
+      setUser(authSession.user);
     } catch (err: any) {
       setError(err.message);
       throw err;
@@ -125,9 +107,7 @@ export const PharmacyProvider: React.FC<{ children: ReactNode }> = ({ children }
   };
 
   const logout = () => {
-    window.sessionStorage.removeItem('pharmapro_token');
-    window.sessionStorage.removeItem('pharmapro_user');
-    localStorage.removeItem('pharmapro_token');
+    clearStoredAuthSession();
     setUser(null);
   };
 

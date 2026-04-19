@@ -5,7 +5,7 @@
 declare const __DEV__: boolean;
 
 interface Window {
-	pharmaproDesktop?: {
+	skladDesktop?: {
 		platform?: string;
 		startupStartedAt?: number | null;
 		versions?: {
@@ -22,5 +22,8 @@ interface Window {
 		saveDatabaseConfig?: (url: string) => Promise<{ success: boolean; error?: string }>;
 		markRuntime?: (name: string, details?: Record<string, unknown>) => void;
 	};
-	__pharmaproRuntimeMarks?: Record<string, boolean>;
+	sklad_token?: string;
+	__skladRuntimeMarks?: Record<string, boolean>;
+  // keep legacy for smooth transition during build
+  pharmaproDesktop?: any; 
 }

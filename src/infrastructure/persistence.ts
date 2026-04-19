@@ -5,7 +5,7 @@ import { Product, IProductRepository, ILogger } from '../core/domain';
  * Handles the "messy" details of serialization and storage.
  */
 export class LocalStorageProductRepository implements IProductRepository {
-  private readonly STORAGE_KEY = 'pharmapro_products';
+  private readonly STORAGE_KEY = 'sklad_products';
 
   async getAll(): Promise<Product[]> {
     const data = localStorage.getItem(this.STORAGE_KEY);

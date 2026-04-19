@@ -48,12 +48,18 @@ usersRouter.post(
     const { name, email, password, role, username, warehouseId } = req.body ?? {};
 
     const trimmedName = String(name || '').trim();
-    const normalizedEmail = normalizeEmail(email);
+    let normalizedEmail = email ? normalizeEmail(email) : '';
     const trimmedPassword = String(password || '');
     const normalizedRole = String(role || '').toUpperCase() as AllowedRole;
 
     if (!trimmedName) throw new ValidationError('Имя обязательно');
-    if (!normalizedEmail || !normalizedEmail.includes('@')) throw new ValidationError('Некорректный email');
+
+    if (!normalizedEmail) {
+      // Generate unique dummy email
+      normalizedEmail = `${username || 'user'}_${Date.now()}@sklad.local`;
+    } else if (!normalizedEmail.includes('@')) {
+      throw new ValidationError('Некорректный email');
+    }
     if (!trimmedPassword || trimmedPassword.length < 6) throw new ValidationError('Пароль должен быть не менее 6 символов');
     if (!ALLOWED_ROLES.includes(normalizedRole)) {
       throw new ValidationError(`Недопустимая роль. Доступные: ${ALLOWED_ROLES.join(', ')}`);
@@ -138,11 +144,14 @@ usersRouter.put(
     }
 
     if (email !== undefined) {
-      const normalized = normalizeEmail(email);
-      if (!normalized || !normalized.includes('@')) throw new ValidationError('Некорректный email');
-      const dup = await db.user.findFirst({ where: { email: normalized, NOT: { id } }, select: { id: true } });
-      if (dup) throw new ValidationError('Этот email уже используется другим пользователем');
-      updateData.email = normalized;
+      const normalized = email ? normalizeEmail(email) : '';
+      if (normalized && !normalized.includes('@')) throw new ValidationError('Некорректный email');
+      
+      if (normalized) {
+        const dup = await db.user.findFirst({ where: { email: normalized, NOT: { id } }, select: { id: true } });
+        if (dup) throw new ValidationError('Этот email уже используется другим пользователем');
+        updateData.email = normalized;
+      }
     }
 
     if (username !== undefined) {

@@ -1,4 +1,5 @@
 import { Supplier } from '../core/domain';
+import { buildApiHeaders } from '../infrastructure/api';
 
 export interface InvoiceImportItem {
   lineId: string;
@@ -154,19 +155,20 @@ export const findSupplierByName = (candidate: string, suppliers: Supplier[]) => 
 
 export const requestStructuredPreview = async (file: File): Promise<OcrAnalyzeResponse> => {
   const fileBase64 = await toBase64(file);
-  const token = localStorage.getItem('pharmapro_token');
-  const response = await fetch('/api/invoices/ocr/structured-preview', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: JSON.stringify({
-      fileBase64,
-      fileName: file.name,
-      mimeType: file.type,
-    }),
-  });
+  let response: Response;
+  try {
+    response = await fetch('/api/invoices/ocr/structured-preview', {
+      method: 'POST',
+      headers: await buildApiHeaders(),
+      body: JSON.stringify({
+        fileBase64,
+        fileName: file.name,
+        mimeType: file.type,
+      }),
+    });
+  } catch {
+    throw new Error('Не удалось подключиться к серверу предпросмотра. Проверьте, что приложение и сервер запущены.');
+  }
 
   const body = await response.json().catch(() => ({}));
   if (!response.ok) {
@@ -178,15 +180,16 @@ export const requestStructuredPreview = async (file: File): Promise<OcrAnalyzeRe
 
 export const requestImageOcr = async (file: File): Promise<OcrAnalyzeResponse> => {
   const imageBase64 = await toBase64(file);
-  const token = localStorage.getItem('pharmapro_token');
-  const response = await fetch('/api/invoices/ocr', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: JSON.stringify({ imageBase64, mimeType: file.type || 'image/png', engine: 'ollama' }),
-  });
+  let response: Response;
+  try {
+    response = await fetch('/api/invoices/ocr', {
+      method: 'POST',
+      headers: await buildApiHeaders(),
+      body: JSON.stringify({ imageBase64, mimeType: file.type || 'image/png', engine: 'ollama' }),
+    });
+  } catch {
+    throw new Error('Не удалось подключиться к OCR-серверу. Проверьте, что приложение и сервер запущены.');
+  }
 
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));

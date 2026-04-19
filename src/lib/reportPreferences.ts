@@ -7,7 +7,6 @@ export type CompanyReportProfile = {
   address: string;
   taxId: string;
   phone: string;
-  email: string;
   directorName: string;
   chiefAccountantName: string;
   reportPreparedBy: string;
@@ -34,9 +33,9 @@ export type ReportUserPreferences = {
   lastActiveTab: ReportTab;
 };
 
-const COMPANY_KEY = 'pharmapro_company_report_profile';
-const templateKey = (userId: string) => `pharmapro_report_templates_${userId}`;
-const preferencesKey = (userId: string) => `pharmapro_report_preferences_${userId}`;
+const COMPANY_KEY = 'sklad_company_report_profile';
+const templateKey = (userId: string) => `sklad_report_templates_${userId}`;
+const preferencesKey = (userId: string) => `sklad_report_preferences_${userId}`;
 
 export const defaultCompanyReportProfile: CompanyReportProfile = {
   pharmacyName: 'Аптека Мой Склад',
@@ -44,7 +43,6 @@ export const defaultCompanyReportProfile: CompanyReportProfile = {
   address: 'Dushanbe',
   taxId: '000000000',
   phone: '',
-  email: '',
   directorName: 'Директор',
   chiefAccountantName: 'Главный бухгалтер',
   reportPreparedBy: 'Финансовый менеджер',

@@ -22,7 +22,6 @@ import {
 } from 'lucide-react';
 import { usePharmacy } from '../context';
 import { useTranslation } from 'react-i18next';
-import { getShiftClosedEventName, loadLatestClosedShiftNotice } from '../../lib/shiftCloseNotice';
 import { lazyNamedImport } from '../../lib/lazyLoadComponents';
 import { buildApiHeaders } from '../../infrastructure/api';
 import { Sidebar, SidebarView } from './Sidebar';
@@ -92,11 +91,10 @@ const ReportsView = lazyNamedImport(() => import('./ReportsView'), 'ReportsView'
 const SettingsView = lazyNamedImport(() => import('./SettingsView'), 'SettingsView');
 const ReturnView = lazyNamedImport(() => import('./ReturnView'), 'ReturnView');
 const WriteOffView = lazyNamedImport(() => import('./WriteOffView'), 'WriteOffView');
-const ShiftView = lazyNamedImport(() => import('./ShiftView'), 'ShiftView');
-const PurchasesView = lazyNamedImport(() => import('./PurchasesView.tsx'), 'PurchasesView');
+const PurchasesView = lazyNamedImport(() => import('./PurchasesView'), 'PurchasesView');
 const AdminView = lazyNamedImport(() => import('./AdminView'), 'AdminView');
 const BatchesView = lazyNamedImport(() => import('./BatchesView'), 'BatchesView');
-const DebtsView = lazyNamedImport(() => import('./DebtsView.tsx'), 'DebtsView');
+const DebtsView = lazyNamedImport(() => import('./DebtsView'), 'DebtsView');
 
 const AppLoader: React.FC<{ label?: string; compact?: boolean }> = ({ label = 'Загрузка...', compact = false }) => (
   <div className={`${compact ? 'min-h-60' : 'h-full min-h-0'} flex items-center justify-center bg-[#f5f5f0]`}>
@@ -146,14 +144,6 @@ export default function AuthenticatedShell({ onSignedOut, onClose }: { onSignedO
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [notificationMetrics, setNotificationMetrics] = useState<AppNotificationMetrics | null>(null);
   const [readNotifications, setReadNotifications] = useState<Set<string>>(new Set());
-  const [latestClosedShiftNotice, setLatestClosedShiftNotice] = useState(loadLatestClosedShiftNotice());
-
-  useEffect(() => {
-    const refreshShiftNotice = () => setLatestClosedShiftNotice(loadLatestClosedShiftNotice());
-    window.addEventListener(getShiftClosedEventName(), refreshShiftNotice as EventListener);
-    return () => window.removeEventListener(getShiftClosedEventName(), refreshShiftNotice as EventListener);
-  }, []);
-
   const loadMetrics = React.useCallback(async () => {
     if (!user) return;
     try {
@@ -177,7 +167,6 @@ export default function AuthenticatedShell({ onSignedOut, onClose }: { onSignedO
         { id: 'debts' as SidebarView, label: 'Клиенты', icon: Clock },
         { id: 'returns' as SidebarView, label: 'Возвраты', icon: RotateCcw },
         { id: 'inventory' as SidebarView, label: 'Инвентарь', icon: Package },
-        { id: 'shifts' as SidebarView, label: 'Смены', icon: Clock },
       ]
     },
     {
@@ -210,11 +199,8 @@ export default function AuthenticatedShell({ onSignedOut, onClose }: { onSignedO
     if (notificationMetrics?.inventoryHighlights?.expiringItems) {
       count += notificationMetrics.inventoryHighlights.expiringItems.filter(it => !readNotifications.has(`expiry-${it.id}`)).length;
     }
-    if (latestClosedShiftNotice && !readNotifications.has(`shiftclose-${latestClosedShiftNotice.shiftId}`)) {
-      count++;
-    }
     return count;
-  }, [notificationMetrics, readNotifications, latestClosedShiftNotice]);
+  }, [notificationMetrics, readNotifications]);
 
   // Собираем уведомления из notificationMetrics
   const notifications = React.useMemo(() => {
@@ -245,19 +231,8 @@ export default function AuthenticatedShell({ onSignedOut, onClose }: { onSignedO
         });
       }
     }
-    if (latestClosedShiftNotice) {
-      arr.push({
-        id: `shiftclose-${latestClosedShiftNotice.shiftId}`,
-        title: 'Смена закрыта',
-        description: `Смена №${latestClosedShiftNotice.shiftNo || ''} закрыта. Итог: ${Number(latestClosedShiftNotice.finalAmount).toFixed(2)} TJS, прибыль: ${Number(latestClosedShiftNotice.grossProfit).toFixed(2)} TJS`,
-        type: 'SYSTEM' as const,
-        linkTo: 'shifts',
-        time: latestClosedShiftNotice.closedAt || '',
-        read: readNotifications.has(`shiftclose-${latestClosedShiftNotice.shiftId}`),
-      });
-    }
     return arr.sort((a, b) => (a.read === b.read ? 0 : a.read ? 1 : -1));
-  }, [notificationMetrics, readNotifications, latestClosedShiftNotice]);
+  }, [notificationMetrics, readNotifications]);
 
   const handleNotificationAction = (notificationId: string, view?: SidebarView) => {
     setReadNotifications(prev => new Set([...Array.from(prev), notificationId]));
@@ -275,7 +250,6 @@ export default function AuthenticatedShell({ onSignedOut, onClose }: { onSignedO
       case 'reports': return <ReportsView />;
       case 'returns': return <ReturnView />;
       case 'writeoffs': return <WriteOffView />;
-      case 'shifts': return <ShiftView />;
       case 'purchases': return <PurchasesView />;
       case 'settings': return <SettingsView />;
       case 'notifications': return <NotificationsView notifications={notifications} onNotificationClick={(id, link) => handleNotificationAction(id, link as SidebarView)} />;
@@ -300,7 +274,7 @@ export default function AuthenticatedShell({ onSignedOut, onClose }: { onSignedO
       />
 
       <main className="flex-1 flex flex-col relative overflow-hidden">
-        {window.pharmaproDesktop?.controls && <DesktopTitlebar controls={window.pharmaproDesktop.controls} onClose={onClose} />}
+        {window.skladDesktop?.controls && <DesktopTitlebar controls={window.skladDesktop.controls} onClose={onClose} />}
 
         <header className="h-24 bg-white/80 backdrop-blur-md border-b border-[#5A5A40]/5 flex items-center justify-between px-10 shrink-0 z-20">
           <div className="flex flex-col">

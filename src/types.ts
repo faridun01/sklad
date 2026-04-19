@@ -210,6 +210,11 @@ export interface Notification {
 export const MOCK_NOTIFICATIONS: Notification[] = [
   {
     id: '1',
+    title: 'Добро пожаловать',
+    message: 'Система Мой Склад успешно запущена.',
+    time: 'только что',
+    type: 'system',
+    read: true,
   },
   {
     id: '2',

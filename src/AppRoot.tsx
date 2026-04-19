@@ -1,7 +1,7 @@
 import './lib/i18n';
 import App from './App';
 
-window.pharmaproDesktop?.markRuntime?.('app-root-module-evaluated', {
+window.skladDesktop?.markRuntime?.('app-root-module-evaluated', {
   ts: Date.now(),
 });
 

@@ -6,7 +6,7 @@ type LoginResponse = {
 };
 
 export const getStoredAuthUser = (): User | null => {
-  const saved = window.sessionStorage.getItem('pharmapro_user');
+  const saved = window.sessionStorage.getItem('sklad_user');
   if (!saved) return null;
 
   try {
@@ -17,9 +17,9 @@ export const getStoredAuthUser = (): User | null => {
 };
 
 export const clearStoredAuthSession = () => {
-  window.sessionStorage.removeItem('pharmapro_token');
-  window.sessionStorage.removeItem('pharmapro_user');
-  window.localStorage.removeItem('pharmapro_token');
+  window.sessionStorage.removeItem('sklad_token');
+  window.sessionStorage.removeItem('sklad_user');
+  window.localStorage.removeItem('sklad_token');
 };
 
 export const loginWithPassword = async (login: string, password: string): Promise<LoginResponse> => {
@@ -35,8 +35,8 @@ export const loginWithPassword = async (login: string, password: string): Promis
   }
 
   const data = payload as LoginResponse;
-  window.sessionStorage.setItem('pharmapro_token', data.token);
-  window.sessionStorage.setItem('pharmapro_user', JSON.stringify(data.user));
-  window.localStorage.setItem('pharmapro_token', data.token);
+  window.sessionStorage.setItem('sklad_token', data.token);
+  window.sessionStorage.setItem('sklad_user', JSON.stringify(data.user));
+  window.localStorage.setItem('sklad_token', data.token);
   return data;
 };

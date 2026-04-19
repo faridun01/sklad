@@ -4,6 +4,7 @@ import { X, Upload, Trash2, FileText, Truck, Calendar, CheckCircle2, AlertCircle
 import { motion, AnimatePresence } from 'motion/react';
 import { usePharmacy } from '../context';
 import { useDebounce } from '../../lib/useDebounce';
+import { buildApiHeaders } from '../../infrastructure/api';
 
 interface ImportInvoiceModalProps {
   isOpen: boolean;
@@ -139,8 +140,35 @@ export const ImportInvoiceModal: React.FC<ImportInvoiceModalProps> = ({ isOpen, 
       } else if (field === 'total') {
         // total редактируется вручную — не трогаем цены
       }
+      updated.packPrice = updated.unitPrice * updated.unitsInPack;
+      updated.total = updated.quantity * updated.unitsInPack * updated.unitPrice;
       return updated;
     }));
+  };
+
+  const updatePendingOcrItem = (lineId: string, field: keyof InvoiceImportItem, value: any) => {
+    setPendingOcrItems((prev) => {
+      if (!prev) return prev;
+
+      return prev.map((item) => {
+        if (item.lineId !== lineId) return item;
+
+        const updated = { ...item, [field]: value };
+
+        if (field === 'packPrice') {
+          updated.unitPrice = updated.unitsInPack > 0 ? value / updated.unitsInPack : 0;
+        }
+
+        updated.packPrice = updated.unitPrice * updated.unitsInPack;
+        updated.total = updated.quantity * updated.unitsInPack * updated.unitPrice;
+
+        return updated;
+      });
+    });
+  };
+
+  const removePendingOcrItem = (lineId: string) => {
+    setPendingOcrItems((prev) => prev?.filter((item) => item.lineId !== lineId) ?? null);
   };
 
   const grossTotal = items.reduce((acc, i) => acc + i.total, 0);
@@ -318,13 +346,9 @@ export const ImportInvoiceModal: React.FC<ImportInvoiceModalProps> = ({ isOpen, 
     setError(null);
     try {
       if (ocrDraftId) {
-        const token = localStorage.getItem('pharmapro_token');
         const response = await fetch(`/api/invoices/ocr/drafts/${ocrDraftId}/import`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
+          headers: await buildApiHeaders(),
           body: JSON.stringify({
             supplierId,
             invoiceNumber,
@@ -547,7 +571,7 @@ export const ImportInvoiceModal: React.FC<ImportInvoiceModalProps> = ({ isOpen, 
                     <div className="flex items-center justify-between gap-3">
                       <div>
                         <p className="text-xs font-bold uppercase tracking-widest text-[#151619]">Предпросмотр распознавания</p>
-                        <p className="text-xs text-[#5A5A40]/70">Проверьте найденные позиции и подтвердите добавление {pendingOcrItems.length} строк в накладную.</p>
+                        <p className="text-xs text-[#5A5A40]/70">Проверьте, исправьте и подтвердите добавление {pendingOcrItems.length} строк в накладную.</p>
                       </div>
                       <div className="flex items-center gap-2">
                         <button type="button" onClick={discardOcrJson} className="px-3 py-1.5 text-xs rounded-lg border border-[#5A5A40]/20 text-[#5A5A40]">Отменить</button>
@@ -561,30 +585,70 @@ export const ImportInvoiceModal: React.FC<ImportInvoiceModalProps> = ({ isOpen, 
                           <tr className="bg-[#f5f5f0] text-[#5A5A40]/70 uppercase tracking-wider text-[10px]">
                             <th className="px-3 py-2">Наименование</th>
                             <th className="px-3 py-2">Коробок</th>
-                            <th className="px-3 py-2">Штук</th>
+                            <th className="px-3 py-2">Кол-во в коробке</th>
                             <th className="px-3 py-2">Цена/коробка</th>
                             <th className="px-3 py-2">Цена/штука</th>
                             <th className="px-3 py-2">Сумма</th>
                             <th className="px-3 py-2">Предупреждения</th>
                             <th className="px-3 py-2">Статус</th>
+                            <th className="px-3 py-2"></th>
                           </tr>
                         </thead>
                         <tbody>
                           {pendingOcrItems.map((row) => {
                             const boxCount = Number(row.quantity) || 0;
-                            const unitsInBox = Number(row.unitsInPack) || 1;
-                            const totalUnits = boxCount * unitsInBox;
+                            const unitsInBox = Number(row.unitsInPack) || 0;
                             const packPrice = Number(row.packPrice ?? 0) || 0;
-                            const unitPrice = Number(row.unitPrice ?? (unitsInBox > 0 ? packPrice / unitsInBox : 0)) || 0;
-                            const totalSum = boxCount * packPrice;
+                            const unitPrice = Number(row.unitPrice ?? 0) || 0;
+                            const totalSum = Number(row.total ?? (boxCount * unitsInBox * unitPrice)) || 0;
                             return (
                               <tr key={row.lineId} className="border-t border-[#5A5A40]/10 align-top">
-                                <td className="px-3 py-2 font-semibold text-[#5A5A40]">{row.name}</td>
-                                <td className="px-3 py-2 whitespace-nowrap">{boxCount}</td>
-                                <td className="px-3 py-2 whitespace-nowrap">{totalUnits}</td>
-                                <td className="px-3 py-2 whitespace-nowrap">{Number.isFinite(packPrice) ? packPrice.toFixed(2) : "0.00"}</td>
-                                <td className="px-3 py-2 whitespace-nowrap">{Number.isFinite(unitPrice) ? unitPrice.toFixed(2) : "0.00"}</td>
-                                <td className="px-3 py-2 whitespace-nowrap">{Number.isFinite(totalSum) ? totalSum.toFixed(2) : "0.00"}</td>
+                                <td className="px-3 py-2 min-w-64">
+                                  <input
+                                    type="text"
+                                    value={row.name}
+                                    onChange={(e) => updatePendingOcrItem(row.lineId, 'name', e.target.value)}
+                                    className="w-full bg-white border border-[#5A5A40]/10 rounded-lg px-2 py-1 text-xs font-semibold text-[#5A5A40]"
+                                  />
+                                </td>
+                                <td className="px-3 py-2 whitespace-nowrap">
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    value={boxCount}
+                                    onChange={(e) => updatePendingOcrItem(row.lineId, 'quantity', parseInt(e.target.value, 10) || 0)}
+                                    className="w-20 bg-white border border-[#5A5A40]/10 rounded-lg px-2 py-1 text-xs"
+                                  />
+                                </td>
+                                <td className="px-3 py-2 whitespace-nowrap">
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    value={unitsInBox}
+                                    onChange={(e) => updatePendingOcrItem(row.lineId, 'unitsInPack', parseInt(e.target.value, 10) || 0)}
+                                    className="w-24 bg-white border border-[#5A5A40]/10 rounded-lg px-2 py-1 text-xs"
+                                  />
+                                </td>
+                                <td className="px-3 py-2 whitespace-nowrap">
+                                  <input
+                                    type="number"
+                                    step="0.01"
+                                    value={Number.isFinite(packPrice) ? packPrice.toFixed(2) : '0.00'}
+                                    readOnly
+                                    className="w-24 bg-[#f5f5f0]/70 border border-[#5A5A40]/10 rounded-lg px-2 py-1 text-xs text-[#5A5A40]/70"
+                                  />
+                                </td>
+                                <td className="px-3 py-2 whitespace-nowrap">
+                                  <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={Number.isFinite(unitPrice) ? unitPrice : 0}
+                                    onChange={(e) => updatePendingOcrItem(row.lineId, 'unitPrice', parseFloat(e.target.value) || 0)}
+                                    className="w-24 bg-white border border-[#5A5A40]/10 rounded-lg px-2 py-1 text-xs"
+                                  />
+                                </td>
+                                <td className="px-3 py-2 whitespace-nowrap font-semibold text-[#5A5A40]">{Number.isFinite(totalSum) ? totalSum.toFixed(2) : "0.00"}</td>
                                 <td className="px-3 py-2 text-[11px] text-amber-800">{row.warnings || 'Без предупреждений'}</td>
                                 <td className="px-3 py-2 whitespace-nowrap">
                                   {row.needsReview ? (
@@ -592,6 +656,11 @@ export const ImportInvoiceModal: React.FC<ImportInvoiceModalProps> = ({ isOpen, 
                                   ) : (
                                     <span className="text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">OK</span>
                                   )}
+                                </td>
+                                <td className="px-3 py-2 text-right">
+                                  <button type="button" onClick={() => removePendingOcrItem(row.lineId)} className="p-1.5 text-[#5A5A40]/30 hover:text-red-500">
+                                    <Trash2 size={16} />
+                                  </button>
                                 </td>
                               </tr>
                             );
@@ -699,7 +768,6 @@ export const ImportInvoiceModal: React.FC<ImportInvoiceModalProps> = ({ isOpen, 
                       <tr className="bg-[#f5f5f0]/50 text-[10px] uppercase tracking-widest text-[#5A5A40]/50 font-bold">
                         <th className="px-4 py-4">№ ({items.length})</th>
                         <th className="px-4 py-4">Товар</th>
-                        <th className="px-4 py-4">Срок годности</th>
                         <th className="px-4 py-4">Количество</th>
                         <th className="px-4 py-4">Цена за упаковку</th>
                         <th className="px-4 py-4">Цена за штуку</th>
@@ -716,9 +784,9 @@ export const ImportInvoiceModal: React.FC<ImportInvoiceModalProps> = ({ isOpen, 
                             {item.confidence && <p className="text-[10px] mt-1 font-bold uppercase tracking-widest text-[#5A5A40]/60">{item.confidence}</p>}
                             {item.warnings && <p className="text-[10px] text-red-500 mt-1">{item.warnings}</p>}
                           </td>
-                          <td className="px-4 py-4"><input type="date" value={item.expiryDate} onChange={(e) => updateItem(item.lineId, 'expiryDate', e.target.value)} className="w-32 bg-white border border-[#5A5A40]/10 rounded-lg px-2 py-1 text-xs" /></td>
                           <td className="px-4 py-4"><input type="number" min="0" value={item.quantity} onChange={(e) => updateItem(item.lineId, 'quantity', parseInt(e.target.value) || 0)} className="w-16 bg-white border border-[#5A5A40]/10 rounded-lg px-2 py-1 text-xs" /></td>
-                          <td className="px-4 py-4"><input type="number" step="0.01" min="0" value={item.packPrice} onChange={(e) => updateItem(item.lineId, 'packPrice', parseFloat(e.target.value) || 0)} className="w-24 bg-white border border-[#5A5A40]/10 rounded-lg px-2 py-1 text-xs" /></td>
+                          <td className="px-4 py-4"><input type="number" min="0" value={item.unitsInPack} onChange={(e) => updateItem(item.lineId, 'unitsInPack', parseInt(e.target.value) || 0)} className="w-24 bg-white border border-[#5A5A40]/10 rounded-lg px-2 py-1 text-xs" /></td>
+                          <td className="px-4 py-4"><input type="number" step="0.01" min="0" value={Number.isFinite(item.packPrice) ? item.packPrice.toFixed(2) : '0.00'} readOnly className="w-24 bg-[#f5f5f0]/70 border border-[#5A5A40]/10 rounded-lg px-2 py-1 text-xs text-[#5A5A40]/70" /></td>
                           <td className="px-4 py-4"><input type="number" step="0.01" min="0" value={item.unitPrice} onChange={(e) => updateItem(item.lineId, 'unitPrice', parseFloat(e.target.value) || 0)} className="w-24 bg-white border border-[#5A5A40]/10 rounded-lg px-2 py-1 text-xs" /></td>
                           <td className="px-4 py-4"><span className="text-xs font-bold text-[#5A5A40]">{item.total.toFixed(2)} TJS</span></td>
                           <td className="px-6 py-4 text-right">
