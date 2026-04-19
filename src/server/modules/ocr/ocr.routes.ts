@@ -11,7 +11,6 @@ import { ValidationError } from '../../common/errors';
 import { findExistingProductByName } from '../../common/productName';
 import { prisma } from '../../infrastructure/prisma';
 import { inventoryService } from '../inventory/inventory.service';
-// ...existing code...
 import { processPdfDocument } from './pdf.hybrid';
 
 // --- Types ---

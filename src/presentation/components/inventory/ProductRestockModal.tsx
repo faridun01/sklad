@@ -98,15 +98,6 @@ export const ProductRestockModal: React.FC<ProductRestockModalProps> = ({
                 className="w-full px-3 py-2.5 border border-[#5A5A40]/15 rounded-xl text-sm"
               />
             </label>
-            <label className="md:col-span-2">
-              <span className="block text-xs font-semibold uppercase tracking-widest text-[#5A5A40]/50 mb-1">Срок годности</span>
-              <input
-                type="date"
-                value={state.expiryDate}
-                onChange={(e) => setState((prev) => ({ ...prev, expiryDate: e.target.value }))}
-                className="w-full px-3 py-2.5 border border-[#5A5A40]/15 rounded-xl text-sm"
-              />
-            </label>
           </div>
 
           {state.error && (

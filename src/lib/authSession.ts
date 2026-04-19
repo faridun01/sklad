@@ -40,3 +40,28 @@ export const loginWithPassword = async (login: string, password: string): Promis
   window.localStorage.setItem('sklad_token', data.token);
   return data;
 };
+
+export const restoreSession = async (): Promise<User | null> => {
+  const token = window.localStorage.getItem('sklad_token');
+  if (!token) return null;
+  
+  try {
+    const response = await fetch('/api/auth/me', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (response.ok) {
+      const user = await response.json();
+      window.sessionStorage.setItem('sklad_user', JSON.stringify(user));
+      window.sessionStorage.setItem('sklad_token', token);
+      return user;
+    } else {
+      clearStoredAuthSession();
+      return null;
+    }
+  } catch {
+    return null;
+  }
+};

@@ -60,6 +60,12 @@ class BaseApi {
   }
 
   protected async handleResponse(response: Response) {
+    if (response.status === 401) {
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('auth:unauthorized'));
+      }
+    }
+
     const parsed = await this.parseJsonSafe(response);
 
     if (!response.ok) {

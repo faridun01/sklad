@@ -62,6 +62,7 @@ import { BootSplash } from './presentation/components/BootSplash';
 
 const App: React.FC = () => {
   const [user, setUser] = React.useState<User | null>(() => getStoredAuthUser());
+  const [isRestoring, setIsRestoring] = React.useState(!user && !!window.localStorage.getItem('sklad_token'));
   const [showSplash, setShowSplash] = React.useState(true);
   const [status, setStatus] = React.useState('Запуск системы...');
   const [error, setError] = React.useState<string | null>(null);
@@ -116,6 +117,19 @@ const App: React.FC = () => {
   }, []);
 
   React.useEffect(() => {
+    if (isRestoring) {
+      import('./lib/authSession').then(({ restoreSession }) => {
+        restoreSession().then(restoredUser => {
+          if (restoredUser) {
+            setUser(restoredUser);
+          }
+          setIsRestoring(false);
+        });
+      });
+    }
+  }, [isRestoring]);
+
+  React.useEffect(() => {
     let polling = true;
     let attempts = 0;
     const MAX_ATTEMPTS = 30; // 30 seconds total
@@ -156,10 +170,15 @@ const App: React.FC = () => {
     setUser(authSession.user);
   };
 
-  const handleSignedOut = () => {
+  const handleSignedOut = React.useCallback(() => {
     clearStoredAuthSession();
     setUser(null);
-  };
+  }, []);
+
+  React.useEffect(() => {
+    window.addEventListener('auth:unauthorized', handleSignedOut);
+    return () => window.removeEventListener('auth:unauthorized', handleSignedOut);
+  }, [handleSignedOut]);
 
   const handleSaveConfig = async (url: string) => {
     setStatus('Применение настроек...');
@@ -235,7 +254,11 @@ const App: React.FC = () => {
         </div>
       )}
       
-      {!user ? (
+      {isRestoring ? (
+        <div className="h-screen flex items-center justify-center bg-[#f5f5f0]">
+          <AppLoader label="Авторизация..." />
+        </div>
+      ) : !user ? (
         <div className="h-screen flex flex-col bg-[#f5f5f0] overflow-hidden">
           {desktopControls ? <DesktopTitlebar controls={desktopControls} onClose={handleSafeClose} /> : null}
           <div className="flex-1 min-h-0">

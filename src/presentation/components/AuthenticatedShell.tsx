@@ -86,6 +86,7 @@ const NotificationsView = lazyNamedImport(() => import('./NotificationsView'), '
 const POSView = lazyNamedImport(() => import('./POSView'), 'POSView');
 const InventoryView = lazyNamedImport(() => import('./InventoryView'), 'InventoryView');
 const InvoicesView = lazyNamedImport(() => import('./InvoicesView'), 'InvoicesView');
+const CustomersView = lazyNamedImport(() => import('./CustomersView'), 'CustomersView');
 const SuppliersPage = lazyNamedImport(() => import('./SuppliersPage'), 'SuppliersPage');
 const ReportsView = lazyNamedImport(() => import('./ReportsView'), 'ReportsView');
 const SettingsView = lazyNamedImport(() => import('./SettingsView'), 'SettingsView');
@@ -164,7 +165,8 @@ export default function AuthenticatedShell({ onSignedOut, onClose }: { onSignedO
       group: 'Торговля', items: [
         { id: 'pos' as SidebarView, label: 'Кассовый терминал', icon: ShoppingCart },
         { id: 'invoices' as SidebarView, label: 'История продаж', icon: Pill },
-        { id: 'debts' as SidebarView, label: 'Клиенты', icon: Clock },
+        { id: 'customers' as SidebarView, label: 'Клиенты', icon: User },
+        { id: 'debts' as SidebarView, label: 'Должники', icon: Clock },
         { id: 'returns' as SidebarView, label: 'Возвраты', icon: RotateCcw },
         { id: 'inventory' as SidebarView, label: 'Инвентарь', icon: Package },
       ]
@@ -245,6 +247,7 @@ export default function AuthenticatedShell({ onSignedOut, onClose }: { onSignedO
       case 'pos': return <POSView />;
       case 'inventory': return <InventoryView />;
       case 'invoices': return <InvoicesView />;
+      case 'customers': return <CustomersView />;
       case 'debts': return <DebtsView />;
       case 'suppliers': return <SuppliersPage />;
       case 'reports': return <ReportsView />;

@@ -6,6 +6,7 @@ import { asyncHandler } from '../../common/http';
 import { ValidationError } from '../../common/errors';
 import { getJwtSecret } from '../../common/jwt';
 import { DATABASE_UNAVAILABLE_MESSAGE, isDatabaseStartupError } from '../../common/startup';
+import { authenticate } from '../../common/auth';
 
 export const authRouter = Router();
 
@@ -117,6 +118,23 @@ authRouter.post('/login', asyncHandler(async (req, res) => {
     return res.status(401).json({ error: 'Invalid credentials' });
   }
 
-  const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, getJwtSecret(), { expiresIn: '1d' });
+  const token = jwt.sign({ id: user.id, email: user.email, role: user.role, name: user.name }, getJwtSecret(), { expiresIn: '1d' });
   res.json({ token, user: { id: user.id, email: user.email, name: user.name, role: user.role } });
+}));
+
+// GET /me — Restores the authenticated user session from token
+authRouter.get('/me', authenticate, asyncHandler(async (req, res) => {
+  const tokenUser = (req as any).user;
+  const dbUser = await prisma.user.findUnique({ where: { id: tokenUser.id }});
+  
+  if (!dbUser || !dbUser.isActive) {
+    return res.status(401).json({ error: 'Пользователь заблокирован или удален' });
+  }
+  
+  res.json({
+    id: dbUser.id,
+    email: dbUser.email,
+    name: dbUser.name,
+    role: dbUser.role,
+  });
 }));

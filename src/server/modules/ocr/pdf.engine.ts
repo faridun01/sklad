@@ -29,7 +29,6 @@ const loadPdfParse = async (): Promise<PdfParseCtor> => {
   return pdfParseLoader;
 };
 
-// ─── Date helpers (duplicated from tesseract.engine to keep modules independent) ──
 
 function normalizeDateStr(s: string): string | undefined {
   const m1 = s.match(/^(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{2,4})$/);

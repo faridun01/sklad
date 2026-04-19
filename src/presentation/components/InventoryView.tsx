@@ -141,7 +141,7 @@ export const InventoryView: React.FC<{ initialSection?: 'catalog' | 'batches' }>
       quantity: '1',
       unit: 'шт.',
       costBasis: String(product.costPrice || 0),
-      expiryDate: '',
+      expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       error: null,
     });
   };

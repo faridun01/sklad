@@ -503,8 +503,32 @@ app.whenReady().then(async () => {
   writeRuntimeLog('app-ready', { isDev, pid: process.pid, appPort: APP_PORT });
   const runtimeUserData = app.getPath('userData');
   const runtimeCache = path.join(runtimeUserData, 'cache');
+  const envPath = path.join(runtimeUserData, '.env');
+
   fs.mkdirSync(runtimeUserData, { recursive: true });
   fs.mkdirSync(runtimeCache, { recursive: true });
+
+  try {
+    let envContent = '';
+    if (fs.existsSync(envPath)) {
+      envContent = fs.readFileSync(envPath, 'utf8');
+    }
+    const lines = envContent.split('\n');
+    const hasJwtSecret = lines.some(line => line.trim().startsWith('JWT_SECRET='));
+    
+    if (!hasJwtSecret) {
+      const jwtSecret = randomBytes(32).toString('hex');
+      const newLines = [...lines.filter(l => l.trim()), `JWT_SECRET="${jwtSecret}"`];
+      fs.writeFileSync(envPath, newLines.join('\n') + '\n', 'utf8');
+      
+      // Reload dotenv for current process so the spawned child can inherit it
+      const dotenv = require('dotenv');
+      dotenv.config({ path: envPath, override: true });
+      writeRuntimeLog('jwt-secret-generated', { path: envPath });
+    }
+  } catch (error) {
+    writeRuntimeLog('jwt-secret-generation-failed', { error: error?.message });
+  }
 
   app.commandLine.appendSwitch('disk-cache-dir', runtimeCache);
   app.commandLine.appendSwitch('disable-gpu-shader-disk-cache');

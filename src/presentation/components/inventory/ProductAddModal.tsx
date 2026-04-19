@@ -79,10 +79,6 @@ export const ProductAddModal: React.FC<ProductAddModalProps> = ({
       return;
     }
 
-    if (!form.expiryDate) {
-      setError('Срок годности обязателен');
-      return;
-    }
     await onSubmit(form);
   };
 
@@ -110,56 +106,12 @@ export const ProductAddModal: React.FC<ProductAddModalProps> = ({
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-[#5A5A40] uppercase tracking-wider">SKU</label>
-                <input 
-                  type="text"
-                  className="w-full px-4 py-3 border border-[#5A5A40]/10 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#5A5A40]/20" 
-                  value={form.sku}
-                  onChange={(e) => handleSkuChange(e.target.value)}
-                  placeholder="Можно оставить пустым"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-[#5A5A40] uppercase tracking-wider">{t('Barcode')}</label>
-                <input 
-                  type="text"
-                  className="w-full px-4 py-3 border border-[#5A5A40]/10 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#5A5A40]/20" 
-                  value={form.barcode}
-                  onChange={(e) => setForm((s) => ({ ...s, barcode: e.target.value }))}
-                />
-              </div>
-
-              <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-[#5A5A40] uppercase tracking-wider">{t('Category')}</label>
                 <input 
                   type="text"
                   className="w-full px-4 py-3 border border-[#5A5A40]/10 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#5A5A40]/20" 
                   value={form.category}
                   onChange={(e) => setForm((s) => ({ ...s, category: e.target.value }))}
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-[#5A5A40] uppercase tracking-wider">{t('Manufacturer')}</label>
-                <input 
-                  type="text"
-                  className="w-full px-4 py-3 border border-[#5A5A40]/10 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#5A5A40]/20" 
-                  value={form.manufacturer}
-                  onChange={(e) => setForm((s) => ({ ...s, manufacturer: e.target.value }))}
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-[#5A5A40] uppercase tracking-wider">
-                  Страна производства {existingProducts.some(p => p.name.trim().toLowerCase() === form.name.trim().toLowerCase()) && '*'}
-                </label>
-                <input 
-                  type="text"
-                  className={`w-full px-4 py-3 border rounded-xl text-sm outline-none transition-all ${existingProducts.some(p => p.name.trim().toLowerCase() === form.name.trim().toLowerCase()) && !form.countryOfOrigin.trim() ? 'border-amber-400 bg-amber-50 focus:ring-amber-200' : 'border-[#5A5A40]/10 focus:ring-[#5A5A40]/20'}`} 
-                  value={form.countryOfOrigin}
-                  onChange={(e) => setForm((s) => ({ ...s, countryOfOrigin: e.target.value }))}
-                  placeholder={existingProducts.some(p => p.name.trim().toLowerCase() === form.name.trim().toLowerCase()) ? "Обязательно при повторе названия" : "Необязательно"}
                 />
               </div>
 
@@ -208,16 +160,6 @@ export const ProductAddModal: React.FC<ProductAddModalProps> = ({
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-red-600 uppercase tracking-wider">{t('Expiry Date')} *</label>
-                <input 
-                  type="date"
-                  className="w-full px-4 py-3 border border-red-200 rounded-xl text-sm outline-none font-semibold focus:ring-2 focus:ring-red-200/50" 
-                  value={form.expiryDate}
-                  onChange={(e) => setForm((s) => ({ ...s, expiryDate: e.target.value }))}
-                />
-              </div>
-
-              <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-[#5A5A40] uppercase tracking-wider">Начальный остаток, ед.</label>
                 <input
                   type="number"
@@ -226,30 +168,6 @@ export const ProductAddModal: React.FC<ProductAddModalProps> = ({
                   onChange={(e) => setForm((s) => ({ ...s, initialUnits: Number(e.target.value) || 0 }))}
                 />
               </div>
-            </div>
-          </div>
-
-          <div className="border-t border-[#5A5A40]/10 pt-4 space-y-3">
-            <p className="text-xs font-semibold text-[#5A5A40] uppercase tracking-wider">{t('Additional')}</p>
-            <div className="flex flex-wrap gap-4">
-              <label className="flex items-center gap-3 text-sm text-[#5A5A40] cursor-pointer hover:bg-[#f5f5f0]/50 p-2 rounded-lg transition">
-                <input 
-                  type="checkbox" 
-                  className="w-4 h-4 cursor-pointer"
-                  checked={form.prescription}
-                  onChange={(e) => setForm((s) => ({ ...s, prescription: e.target.checked }))}
-                />
-                {t('Prescription')}
-              </label>
-              <label className="flex items-center gap-3 text-sm text-[#5A5A40] cursor-pointer hover:bg-[#f5f5f0]/50 p-2 rounded-lg transition">
-                <input 
-                  type="checkbox" 
-                  className="w-4 h-4 cursor-pointer"
-                  checked={form.markingRequired}
-                  onChange={(e) => setForm((s) => ({ ...s, markingRequired: e.target.checked }))}
-                />
-                {t('Marking required')}
-              </label>
             </div>
           </div>
 
